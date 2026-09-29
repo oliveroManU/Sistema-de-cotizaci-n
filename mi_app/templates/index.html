@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Cotizaciones</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/Funciones.js') }}" defer></script>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Velazcres</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarText">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Registro</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Productos</a>
+        </li>
+      </ul>
+      <span class="navbar-text">
+        Eslogan
+      </span>
+    </div>
+  </div>
+</nav>
+    </header>
+
+  <div class="contenedor-formularios ">
+    <div class="form-group rounded-top border-success rounded-top" style="width: 60%;">
+        <form action="">
+    <h2>Informacion del cliente</h2>
+        <label for="">Nombre Cliente</label>
+        <input id="nombre-cliente" class="form-control" placeholder="Nombre Apellido" type="text">
+        <label for="">rif fiscal</label>
+        <input id="riff-cliente" maxlength="9" placeholder="11.XXX.XXX-X" class="form-control" type="text">
+        <label for="">direccion cliente</label>
+        <input class="form-control" placeholder="Estado, Municipio, Localidad, Avenida" type="text">
+        <label for="">web cliente</label>
+        <input class="form-control" placeholder="www.ejemplo.com" type="text">
+        <label for="">mail cliente</label>
+        <input id="emailclient" placeholder="ejemplo@email.com" class="form-control" type="text">
+        <label for="">Telefono cliente</label>
+        <input maxlength="11" placeholder="0414 XXX XX XX" id="Telefono-client" class="form-control" type="text">
+        <input type="submit">
+        </form>
+    </div>
+    <div class="form-group rounded-top border-success rounded-top">
+        <form action="">
+
+            <h2>Informacion de Cotizacion</h2>
+        <label for="">id de Cotizacion</label>
+        <input class="form-control" type="text" placeholder="000001">
+        <label for="">tipo de moneda</label>
+        <select class="form-control" name="" id="">
+        <option value="bs">Bolivares Bs.</option>
+        <option value="dola">Dolares $.</option>        
+        <option value="euro">Euros €.</option>
+        </select>
+        <label for="">Forma de pago</label>
+        <select class="form-control" name="" id="Forma">
+        <option value="bs">Transferencia Bancaria</option>
+        <option value="dola">Efectivo</option>
+        <option value="">Pago Movil</option>
+        </select>
+
+        </form>
+    </div>
+
+   </div> 
+
+    <div>
+    <table class="table table-margin" id="tabla-productos">
+        <thead class="thead-dark">
+            <tr>
+                <th>Items</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Subtotal</th>
+                <th>Descuento</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+            <tr>
+                <th>
+                  
+                    <select name="producto" id="producto" >
+					gggg
+						<option value="0" disabled selected>-- Seleccionar --</option>
+
+						{% for product in productos %}
+							<option value="{{ product.CODIGO }}" id="producto">
+								{{ product.NOMBRE }}
+							</option>
+						{% endfor %}
+                    </select>
+                </th>
+                <td><input type="text" class="cantidad-producto" placeholder="1" oninput="multiplicacion(this)"></td>
+                <td><input type="text" class="precio-producto" placeholder="1.000" oninput="multiplicacion(this)"></td>
+                <td><input type="number" class="resultado-multiplicacion" readonly placeholder="0.00"></td>
+                <td><input type="text" class="descuento" oninput="multiplicacion(this)" placeholder="5%"></td>
+                <td><input type="text" class="total-fin" readonly></td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    
+    <div class="mt-3 margin-botones-agregar-eliminar">
+        <button type="button" class="btn btn-info" onclick="insertarProducto()"> Insertar Producto</button>
+        <button type="button" class="btn btn-danger" onclick="eliminarTodos()"> Eliminar Todos</button>
+    </div>
+
+    <div class="mt-3">
+        <label><strong>Total General:</strong></label>
+        <input type="text" id="total-general" readonly placeholder="0.00" class="form-control" style="max-width: 200px;">
+    </div>
+</div>
+<!-- Input donde se reflejará la tasa del BCV automáticamente -->
+<label for="tasaBcv">Tasa BCV:</label>
+<input type="text" id="tasaBcvDolar" readonly placeholder="Buscando tasa...">
+<label for="tasaBcv">Tasa BCV (Euro):</label>
+<input type="text" id="tasaBcvEuro" readonly placeholder="Buscando tasa...">
+   
+</body>
+<script>
+function insertarProducto() {
+    const cuerpoTabla = document.getElementById('cuerpo-tabla');
+    const nuevaFila = document.createElement('tr');
+    
+    nuevaFila.innerHTML = `
+        <th>
+            <select name="producto">
+                    <option value="0" disabled selected>-- Seleccionar --</option>
+
+                    {% for product in productos %}
+                    <option value="{{ product.CODIGO }}">
+                        {{ product.NOMBRE }}
+
+                    </option>
+
+                    {% endfor %}
+            </select>
+        </th>
+        <td><input type="text" class="cantidad-producto" placeholder="1" oninput="multiplicacion(this)"></td>
+        <td><input type="text" class="precio-producto" placeholder="1.000" oninput="multiplicacion(this)"></td>
+        <td><input type="number" class="resultado-multiplicacion" readonly placeholder="0.00"></td>
+        <td><input type="text" class="descuento" oninput="multiplicacion(this)" placeholder="5%"></td>
+        <td><input type="text" class="total-fin" readonly></td>
+        <td>
+            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
+        </td>
+    `;
+    cuerpoTabla.appendChild(nuevaFila);
+}
+</script> 
+</html>

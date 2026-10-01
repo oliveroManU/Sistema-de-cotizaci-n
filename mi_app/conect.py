@@ -59,3 +59,18 @@ def actualizar_producto(producto_id):
     
     
     return redirect(url_for('mostrador'))
+
+@app.route('/cotizacion-int', methods=['POST'])
+def cotizacion_int():
+    nombre = request.form['nombre']
+    precio = float(request.form['precia'])
+    cantidad = int(request.form['cantidad'])
+    tasapago = request.form['tasapago']
+    moneda =  request.form['moneda']
+    precioventa = request.form['precioventa']
+    ganancia = request.form['ganacia']
+    conn = sqlite3.connect('Velazcres.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO usuario (NOMBRE, PRECIO, CANTIDAD, TASAPAGO, MONEDA, PRECIOVENTA, GANANCIA) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+                   (nombre, precio, cantidad, tasapago, moneda, precioventa, ganancia   ))
+    conn.close()

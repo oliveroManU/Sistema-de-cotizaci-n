@@ -9,7 +9,6 @@
     <title>Document</title>
 </head>
 <body>
-
 <header>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
@@ -37,29 +36,24 @@
 </nav>
 </header>
 
-<div  class="contenedor-formularios">
-    <div class="form-group rounded-top border-success rounded-top">
-    <h1>editar</h1>
-    <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['CODIGO'])}}">
-
-        <label for="">nombre:</label><br>
-        <input type="text" name="NOMBRE" id="NOMBRE"  value="{{producto['NOMBRE']}}" required> <br><br>
-
-        <label for="">Precio:</label><br>
-        <input type="text" name="PRECIO" id="PRECIO" step="0.01" value="{{producto['PRECIO']}}" required> <br><br>
-
-            <button type="submit">Guardar</button>
-            <button>
-                <a href="{{ url_for('mostrador') }}">cancelar</a>
-            </button>
-    </div>
-        <div>
-            <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['CODIGO']|string + '.jpg') }}" class="card-img-top" alt="...">
-        </div>
-
-
-        
+<div>
+    <form action="">
+        <label for="">Nombre</label>
+        <input type="text" name="nombre">
+        <label for="">Precio</label>
+        <input type="text" name="precio">
+        <label for="">Cantidad</label>
+        <input type="text" name="cantidad">
+        <label for="">Moneda</label>
+        <input type="text" name="moneda">
+        <label for="">Tasapago</label>
+        <input type="text" name="tasapago">
+        <label for="">Precio-Venta</label>
+        <input type="text" name="precioventa">
+        <label for="">Ganancia</label>
+        <input type="text" name="ganancia">
     </form>
 </div>
+
 </body>
 </html>

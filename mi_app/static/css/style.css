@@ -1,3 +1,5 @@
+@import url("mostrador.css");
+
 .contenedor-formularios {
     display: flex;
     gap: 20px; /* separación entre los dos bloques */
@@ -28,8 +30,14 @@
 }
 
 .table-margin{
-    max-width: 90%;
+    max-width: 80%;
     margin-left: 5%;
     margin-right: 5%;
     margin-bottom: 4%;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;     
+}
+
+.margin-botones-agregar-eliminar{
+    margin-left: 60px;
 }

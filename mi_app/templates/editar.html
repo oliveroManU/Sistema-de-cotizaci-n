@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>editar</h1>
+    <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['CODIGO'])}}">
+        <label for="">nombre:</label><br>
+        <input type="text" name="NOMBRE" id="NOMBRE"  value="{{producto['NOMBRE']}}" required> <br><br>
+
+        <label for="">Precio:</label><br>
+        <input type="text" name="PRECIO" id="PRECIO" step="0.01" value="{{producto['PRECIO']}}" required> <br><br>
+
+        <button type="submit">Guardar</button>
+        <a href="{{ url_for('mostrador') }}">cancelar</a>
+
+
+
+    </form>
+</body>
+</html>

@@ -28,35 +28,6 @@ TelefonoCliente.addEventListener('input', function() {
 // GESTIÓN DE FILAS DE PRODUCTOS
 // ===============================
 
-function insertarProducto() {
-    const cuerpoTabla = document.getElementById('cuerpo-tabla');
-    const nuevaFila = document.createElement('tr');
-    
-   /* 
-    nuevaFila.innerHTML = `
-        <th>
-            <select name="producto">
-                <option value="0" disabled selected>Selecciona un producto</option>
-                <option value="1">producto 1</option>
-                <option value="2">producto 2</option>
-                <option value="3">producto 3</option>
-                <option value="4">producto 4</option>
-                <option value="5">producto 5</option>
-                <option value="6">producto 6</option>
-            </select>
-        </th>
-        <td><input type="text" class="cantidad-producto" placeholder="1" oninput="multiplicacion(this)"></td>
-        <td><input type="text" class="precio-producto" placeholder="1.000" oninput="multiplicacion(this)"></td>
-        <td><input type="number" class="resultado-multiplicacion" readonly placeholder="0.00"></td>
-        <td><input type="text" class="descuento" oninput="multiplicacion(this)" placeholder="5%"></td>
-        <td><input type="text" class="total-fin" readonly></td>
-        <td>
-            <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
-        </td>
-    `;
-    */
-    cuerpoTabla.appendChild(nuevaFila);
-}
 
 function eliminarFila(boton) {
     const fila = boton.closest('tr');
@@ -72,37 +43,6 @@ function eliminarFila(boton) {
     }
     
     calcularTotalGeneral();
-}
-
-function eliminarTodos() {
-    const cuerpoTabla = document.getElementById('cuerpo-tabla');
-    
-    if (confirm('¿Estás seguro de que deseas eliminar todos los productos?')) {
-        cuerpoTabla.innerHTML = `
-            <tr>
-                <th>
-                    <select name="producto">
-                        <option value="0" disabled selected>Selecciona un producto</option>
-                        <option value="1">producto 1</option>
-                        <option value="2">producto 2</option>
-                        <option value="3">producto 3</option>
-                        <option value="4">producto 4</option>
-                        <option value="5">producto 5</option>
-                        <option value="6">producto 6</option>
-                    </select>
-                </th>
-                <td><input type="text" class="cantidad-producto" placeholder="1" oninput="multiplicacion(this)"></td>
-                <td><input type="text" class="precio-producto" placeholder="1.000" oninput="multiplicacion(this)"></td>
-                <td><input type="number" class="resultado-multiplicacion" readonly placeholder="0.00"></td>
-                <td><input type="text" class="descuento" oninput="multiplicacion(this)" placeholder="5%"></td>
-                <td><input type="text" class="total-fin" readonly></td>
-                <td>
-                    <button type="button" class="btn btn-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button>
-                </td>
-            </tr>
-        `;
-        calcularTotalGeneral();
-    }
 }
 
 function multiplicacion(elemento) {

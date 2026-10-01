@@ -1,0 +1,16 @@
+.contenedor-mostrador{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.producto-mostrador{
+    border: 1px solid #ccc;
+    padding: 15px;
+    width: 200px;
+}
+
+.producto-img{
+    max-width: 100%;
+    height: auto;
+}

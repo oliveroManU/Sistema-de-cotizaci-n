@@ -122,3 +122,17 @@ window.onload = function() {
     obtenerTasaBCV();
     obtenerTasaBCVEuro();
 };
+
+const EditarPrecio = document.getElementById('PRECIO');
+
+EditarPrecio.addEventListener('input', function() {
+
+   this.value = this.value.match(/[+-]?(?:\d+\.\d+|\d+\.|\.\d+|\d+)(?:[eE][+-]?\d+)?/)?.[0] || '';
+
+
+
+
+
+});
+
+

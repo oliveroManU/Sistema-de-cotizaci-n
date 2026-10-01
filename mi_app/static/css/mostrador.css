@@ -1,16 +1,26 @@
 .contenedor-mostrador{
+    margin-left: 5%;
+    margin-top: 7%;
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
 }
 
+h1{
+    margin-left: 5%;
+    margin-top: 4%;
+}
+
 .producto-mostrador{
+    margin-left: 5%;
     border: 1px solid #ccc;
     padding: 15px;
     width: 200px;
 }
 
 .producto-img{
+    
+    display: block;
     max-width: 100%;
-    height: auto;
+    height: 25vh;
 }

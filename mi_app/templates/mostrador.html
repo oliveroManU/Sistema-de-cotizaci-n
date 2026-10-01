@@ -35,15 +35,16 @@
 </nav>
 
     </header>
-    <div >
-        <h1>Productos</h1>
+    <h1>Productos</h1>
+    <div class="" >
+        
 
-        <div class="contenedor-mostrador">
+        <div class=" contenedor-mostrador ">
             {% for producto in productos %}
 
             
 
-        <div class="  card" style="width: 18rem;">
+        <div class="  card " style="width: 18rem;">
 
         <a href="{{ url_for('editar_producto', producto_id= producto['CODIGO']) }}">
         <img class="producto-img" src="{{ url_for('static', filename='img/productos/' + producto['CODIGO']|string + '.jpg') }}" class="card-img-top" alt="...">
@@ -53,10 +54,11 @@
                 <h4>Precio: ${{ producto.precio }}</h4>
                 <h4>cantidad</h4>
             </div>
+        </div>
+
             {% endfor %}
 
 
-        </div>
 
 
 

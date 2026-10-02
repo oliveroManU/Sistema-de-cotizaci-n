@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script src="{{ url_for('static', filename='js/Funciones.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/FuncionesInsert.js') }}" defer></script>
     <title>Document</title>
 </head>
 <body>
@@ -36,24 +36,105 @@
 </nav>
 </header>
 
-<div>
-    <form action="">
+<div class="contenedor-formularios">
+  <div  class="form-group rounded-top border-success rounded-top" style="width: 60%;">
+    <form  action="{{ url_for('cotizacion_int') }}" method="POST" >
         <label for="">Nombre</label>
-        <input type="text" name="nombre">
-        <label for="">Precio</label>
-        <input type="text" name="precio">
-        <label for="">Cantidad</label>
-        <input type="text" name="cantidad">
+        <input class="form-control" type="text" name="nombre-producto">
+        <label for="">Marca</label>
+        <input class="form-control" type="text" name="marca">
         <label for="">Moneda</label>
-        <input type="text" name="moneda">
+        <input class="form-control" type="text" name="moneda" value="Bs." readonly>
+        <label for="">Gastado</label>
+        <input class="form-control precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto">
+        <label for="">Cantidad</label>
+        <input class="form-control cantidad-producto" type="number" oninput="multiplicacion(this)" name="cantidad-producto">
+        <label for="">Precio por unidad</label>
+        <input class="multiplicacion-precio-cantidad form-control" type="text" readonly>
         <label for="">Tasapago</label>
-        <input type="text" name="tasapago">
+        <input class="form-control tasapago" type="text" name="tasapago" oninput="multiplicacion(this)">
+        <label for="">precio compra</label>
+        <input class="form-control preciocompra " type="text" name="tasapago" oninput="multiplicacion(this)">
         <label for="">Precio-Venta</label>
-        <input type="text" name="precioventa">
-        <label for="">Ganancia</label>
-        <input type="text" name="ganancia">
+        <input class="form-control precioventa" type="text" name="precioventa" oninput="multiplicacion(this)">
+        <label for="">Total</label>
+        <label for="">Dolares:</label>
+        <input type="number" class="form-control total-fin" readonly>
+        <label for="">Bolivares: </label>
+        <input type="number" class="form-control total-fin2" readonly> 
+        <button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button>
     </form>
+  </div>
+
+  <table style="width: 45%; margin-left: auto; margin-right: auto;" class="table table-striped table-bordered bg-white table-sm ">
+    <thead class="thead-dark">
+      <tr>
+        <th>Nombre</th>
+        <th>Precio</th>
+        <th>Cantidad</th>
+        <th>Moneda</th>
+        <th>Tasapago</th>
+        <th>Precio-Venta</th>
+        <th>ganancia</th>
+
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        
+      </tr>
+
+
+    </tbody>
+
+
+    
+  </table>
+
+
+
 </div>
+
+<div>
+  <table  style="width: 75%; margin-left: auto; margin-right: auto;" class="table table-striped table-bordered bg-white table-sm ">
+    <thead class="table-success">
+      <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      </tr>
+
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        
+
+
+      </tr>
+
+
+
+    </tbody>
+  </table>
+</div>
+
 
 </body>
 </html>

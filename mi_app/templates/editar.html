@@ -23,7 +23,7 @@
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('cotizacion-int') }}">Registro</a>
+          <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('mostrador') }}">Productos</a>
@@ -40,13 +40,13 @@
 <div  class="contenedor-formularios">
     <div class="form-group rounded-top border-success rounded-top">
     <h1>editar</h1>
-    <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['CODIGO'])}}">
+    <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['id'])}}">
 
         <label for="">nombre:</label><br>
-        <input type="text" name="NOMBRE" id="NOMBRE"  value="{{producto['NOMBRE']}}" required> <br><br>
+        <input type="text" name="nombre" id="nombre"  value="{{producto['nombre']}}" required> <br><br>
 
         <label for="">Precio:</label><br>
-        <input type="text" name="PRECIO" id="PRECIO" step="0.01" value="{{producto['PRECIO']}}" required> <br><br>
+        <input type="text" name="precio" id="precio" step="0.01" value="{{producto['precio']}}" required> <br><br>
 
             <button type="submit">Guardar</button>
             <button>
@@ -54,7 +54,7 @@
             </button>
     </div>
         <div>
-            <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['CODIGO']|string + '.jpg') }}" class="card-img-top" alt="...">
+            <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" class="card-img-top" alt="...">
         </div>
 
 

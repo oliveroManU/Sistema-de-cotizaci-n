@@ -21,7 +21,7 @@
           <a class="nav-link active" aria-current="page" href="#">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Registro</a>
+          <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Productos</a>
@@ -46,8 +46,8 @@
 
         <div class="  card " style="width: 18rem;">
 
-        <a href="{{ url_for('editar_producto', producto_id= producto['CODIGO']) }}">
-        <img class="producto-img" src="{{ url_for('static', filename='img/productos/' + producto['CODIGO']|string + '.jpg') }}" class="card-img-top" alt="...">
+        <a href="{{ url_for('editar_producto', producto_id= producto['id']) }}">
+        <img class="producto-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" class="card-img-top" alt="...">
         </a>
             <div class="card-body">
                 <h2>{{ producto.nombre }}</h2>

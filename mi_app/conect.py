@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import os
 import sqlite3
@@ -10,6 +10,7 @@ import urllib3
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 DB_PATH = os.path.join(basedir, 'Velazcress.db')
 
@@ -71,40 +72,87 @@ def cotizacion_int():
     marca = request.form.get('marca')
     precio = float(request.form.get('precio-producto', 0))
     cantidad = int(request.form.get('cantidad-producto', 0))
-    preciounidad = float(request.form.get('preciounidad', 0))
+    preciounidad = float(request.form.get('precioporunidad', 0))
     tasapago = float(request.form.get('tasapago', 0))
     moneda =  request.form.get('moneda')
     preciod = float(request.form.get('preciod', 0))
+    precioventa = float(request.form.get('precio-venta', 0))
+    gananciaD = float(request.form.get('gananciaD', 0))
+    gananciaBs =  float(request.form.get('gananciaBs', 0))
     conn = sqlite3.connect('Velazcress.db')
     conn.row_factory = sqlite3.Row
+    productos = conn.execute("SELECT * FROM productos").fetchall()
     cursor = conn.cursor()
     ### anñadir : cantidad, moneda
-    cursor.execute('INSERT INTO productos (nombre, marca, precio, cantidad, precioporunidad, moneda, tasapago, precioD) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', 
-                   (nombre, marca, precio, cantidad, preciounidad, moneda, tasapago, preciod  ))
+    cursor.execute('INSERT INTO productos (nombre, marca, precio, cantidad, precioporunidad, moneda, tasapago, precioD, precio_venta, ganancia_estimadaD, ganancia_estimadaBs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+                   (nombre, marca, precio, cantidad, preciounidad, moneda, tasapago, preciod, precioventa, gananciaD, gananciaBs  ))
     conn.commit()
     conn.close()
-    return render_template('insersion.html', tasa_bcv=tasa_bcv)
+    return render_template('insersion.html', tasa_bcv=tasa_bcv, productos=productos)
 
-###@app.route('/cotizacion_ext', methods=['GET','POST'])
-""" def cotizacion_int():
-    tasa_bcv = obtener_tasa_bcv()
-    nombre = request.form.get('nombre')
-    precio = float(request.form.get('precio', 0))
-    cantidad = int(request.form.get('cantidad', 0))
-    tasapago = request.form.get('tasapago')
-    moneda =  request.form.get('moneda')
-    precioventa = request.form.get('precioventa')
-    ganancia = request.form.get('ganacia')
-    conn = sqlite3.connect('Velazcres.db')
+@app.route('/listado')
+def listado():
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    ### anñadir : cantidad, moneda
-    cursor.execute('INSERT INTO productos (nombre, precio, cantidad, moneda, tasapago, GANANCIA) VALUES (?, ?, ?, ?, ?)', 
-                   (nombre, precio, tasapago, precioventa, ganancia   ))
+    cursor = conn.execute('SELECT * FROM productos')
+    productos = cursor.fetchall()
+    conn.close()
+    return render_template('listado.html', productos=productos) 
+
+@app.route('/productos/<int:productos_id>')
+def editar_productos1(productos_id):
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        cursor = conn.cursor()
+        cursor = conn.execute('SELECT * FROM productos WHERE id = ?', (productos_id,))
+        productos = cursor.fetchone()
+    
+    if productos is None:
+        return "Producto no encontrado", 404
+    return render_template('editarlistado.html', productos=productos)
+
+@app.route('/productos/<int:productos_id>', methods=['POST'])
+def actualizar_productos1(productos_id):
+    nombre = request.form.get('nombre')    
+    marca = request.form.get('marca')
+    precio = float(request.form.get('precio-producto', 0))
+    cantidad = int(request.form.get('cantidad-producto', 0))
+    preciounidad = float(request.form.get('precioporunidad', 0))
+    tasapago = float(request.form.get('tasapago', 0))
+    moneda =  request.form.get('moneda')
+    preciod = float(request.form.get('preciod', 0))
+    precioventa = float(request.form.get('precio-venta', 0))
+    gananciaD = float(request.form.get('gananciaD', 0))
+    gananciaBs =  float(request.form.get('gananciaBs', 0))
+        
+    with sqlite3.connect(DB_PATH) as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            'UPDATE productos SET nombre = ?, marca = ?, precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, moneda = ?, precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? WHERE id = ? ',
+            (nombre, marca, precio, cantidad, preciounidad, tasapago, moneda, preciod, precioventa, gananciaD, gananciaBs, productos_id)
+        )
+            
+    conn.commit()
+        
+        
+        
+    return redirect(url_for('listado'))
+
+@app.route('/eliminar/<int:productos_id>', methods=["POST"])
+def eliminar_producto1(productos_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("DELETE FROM productos WHERE id = ?", (productos_id,))    
     conn.commit()
     conn.close()
-    return render_template('insersion.html', tasa_bcv=tasa_bcv)
-"""
+    
+    flash('Producto eliminado')
+    return redirect(url_for('listado'))
+    
+    
+    
+    
+
 
 def obtener_tasa_bcv():
     url = 'https://www.bcv.org.ve'

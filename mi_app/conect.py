@@ -107,37 +107,46 @@ def editar_productos1(productos_id):
         cursor = conn.cursor()
         cursor = conn.execute('SELECT * FROM productos WHERE id = ?', (productos_id,))
         productos = cursor.fetchone()
+    tasa_bcv = obtener_tasa_bcv()
     
     if productos is None:
         return "Producto no encontrado", 404
-    return render_template('editarlistado.html', productos=productos)
+    return render_template('editarlistado.html', productos=productos, tasa_bcv=tasa_bcv)
+
+    
 
 @app.route('/productos/<int:productos_id>', methods=['POST'])
 def actualizar_productos1(productos_id):
-    nombre = request.form.get('nombre')    
-    marca = request.form.get('marca')
-    precio = float(request.form.get('precio-producto', 0))
-    cantidad = int(request.form.get('cantidad-producto', 0))
-    preciounidad = float(request.form.get('precioporunidad', 0))
-    tasapago = float(request.form.get('tasapago', 0))
-    moneda =  request.form.get('moneda')
-    preciod = float(request.form.get('preciod', 0))
-    precioventa = float(request.form.get('precio-venta', 0))
-    gananciaD = float(request.form.get('gananciaD', 0))
-    gananciaBs =  float(request.form.get('gananciaBs', 0))
+    
+    try:
         
-    with sqlite3.connect(DB_PATH) as conn:
-        cursor = conn.cursor()
-        cursor.execute(
-            'UPDATE productos SET nombre = ?, marca = ?, precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, moneda = ?, precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? WHERE id = ? ',
-            (nombre, marca, precio, cantidad, preciounidad, tasapago, moneda, preciod, precioventa, gananciaD, gananciaBs, productos_id)
-        )
-            
-    conn.commit()
+        nombre = request.form.get('nombre', '').strip()    
+        marca = request.form.get('marca', '').strip()
+        moneda =  request.form.get('moneda', '').strip()
+        precio = float(request.form.get('precio-producto', 0))
+        cantidad = int(request.form.get('cantidad-producto', 0))
+        preciounidad = float(request.form.get('precioporunidad', 0))
+        tasapago = float(request.form.get('tasapago', 0))  
+        preciod = float(request.form.get('preciod', 0))
+        precioventa = float(request.form.get('precio-venta', 0))
+        gananciaD = float(request.form.get('gananciaD', 0))
+        gananciaBs =  float(request.form.get('gananciaBs', 0))
+        
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                'UPDATE productos SET nombre = ?, marca = ?, precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, moneda = ?, precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? WHERE id = ? ',
+                (nombre, marca, precio, cantidad, preciounidad, tasapago, moneda, preciod, precioventa, gananciaD, gananciaBs, productos_id)
+            )           
+            conn.commit()
+    
+        flash('Producto Actualizado correctamnet', 'si')
+        return redirect(url_for('listado'))   
         
         
-        
-    return redirect(url_for('listado'))
+    except (ValueError,TypeError) as e:
+        flash(f'error en los datos: {e}', 'no')
+        return redirect(url_for('actualizar_productos1', productos_id=productos_id, ))
 
 @app.route('/eliminar/<int:productos_id>', methods=["POST"])
 def eliminar_producto1(productos_id):

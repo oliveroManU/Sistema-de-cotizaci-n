@@ -1,16 +1,3 @@
-const inputnombrecliente = document.getElementById('nombre');
-
-if (inputNombreCliente){ 
-    inputNombreCliente.addEventListener('input', function () {
-    this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
-    if (this.value.length > 0 && this.value.length < 3) {
-        this.setCustomValidity('Mínimo 3 caracteres');
-    } else {
-        this.setCustomValidity('');
-    }
-});
-}
-
 function multiplicacion(elemento) {
     const fila = elemento.closest('form');
     
@@ -25,16 +12,20 @@ function multiplicacion(elemento) {
     const PrecioDolaresHoy = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProductoHoy) : 0;
     const total = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProducto)) : 0;
     const total2 = PrecioVenta - PrecioProducto;  
-    const ValorActualDolar = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProductoHoy)) : 0;
-    const ValorActualBs = PrecioDolares * TasaPagoProductoHoy;  
+    const PorcentajeValorActualDolar = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProductoHoy)) : 0;
+    const PorcentajeCompraVenta =  ((PrecioVenta - PrecioProducto) / PrecioProducto) * 100 
+    const PorcentajeDevaluacion = ((TasaPagoProductoHoy - TasaPagoProducto)/TasaPagoProducto)*100
+    
 
     fila.querySelector('.precioporunidad').value = ValorPorUnidad.toFixed(2);
     fila.querySelector('.preciod').value = PrecioDolares.toFixed(2);
     fila.querySelector('.preciod1').value = PrecioDolaresHoy.toFixed(2);
     fila.querySelector('.gananciaD').value = total.toFixed(4);
     fila.querySelector('.gananciaBs').value = total2.toFixed(4);
-    fila.querySelector('.ValorActualD').value = ValorActualDolar.toFixed(4);
-    fila.querySelector('.ValorActualBs').value = ValorActualBs.toFixed(4);
+    fila.querySelector('.porcentajeCV').value = PorcentajeCompraVenta.toFixed(2);
+    fila.querySelector('.ValorActualD').value = PorcentajeValorActualDolar.toFixed(4);
+    fila.querySelector('.porcentajedevaluacion').value = PorcentajeDevaluacion.toFixed(2);
+    
 
     calcularTotalGeneral();
 }

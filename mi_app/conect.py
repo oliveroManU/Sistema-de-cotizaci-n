@@ -113,7 +113,6 @@ def editar_productos1(productos_id):
         return "Producto no encontrado", 404
     return render_template('editarlistado.html', productos=productos, tasa_bcv=tasa_bcv)
 
-    
 
 @app.route('/productos/<int:productos_id>', methods=['POST'])
 def actualizar_productos1(productos_id):
@@ -147,6 +146,8 @@ def actualizar_productos1(productos_id):
     except (ValueError,TypeError) as e:
         flash(f'error en los datos: {e}', 'no')
         return redirect(url_for('actualizar_productos1', productos_id=productos_id, ))
+
+
 
 @app.route('/eliminar/<int:productos_id>', methods=["POST"])
 def eliminar_producto1(productos_id):

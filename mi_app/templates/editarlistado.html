@@ -42,46 +42,49 @@
     <h1>editar</h1>
     <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">
 
-        <label for="">nombre:</label><br>
-        <input class="nombre" type="text" name="nombre" id="nombre"
-        value="{{productos['nombre']}}" required> <br><br>
-       
-        <label for="">Moneda:</label><br>
-        <input class="moneda" type="text" name="moneda" id="moneda"
-        value="{{productos['moneda']}}" required readonly> <br><br>
+       <h2>{{productos['nombre']}}</h2>
+       <h3>{{productos['marca']}}</h3>
 
         <label for="">Precio:</label><br>
         <div><span>Bs.
         <input class="precio-producto" type="text" name="precio-producto" id="precio"
-        value="{{productos['precio']}}" required oninput="multiplicacion(this)"> <br><br>
+        value="{{productos['precio']}}" required oninput="multiplicacion(this)" > <br><br>
         </span></div>
-
-        <label for="">Marca:</label><br>
-        <input class="marca" type="text" name="marca" id="marca"
-        value="{{productos['marca']}}" required> <br><br>
 
         <label for="">cantidad:</label><br>
         <input class="cantidad-producto" type="text" name="cantidad-producto" id="cantidad-producto"
         value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> <br><br>
     
         <label for="">Precio por unidad:</label><br>
-        <div><span>Bs.
-        <input class="precioporunidad" type="text" name="precioporunidad" id="precioporunidad"
-        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"> <br><br>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">$</span>
+        <span class="input-group-text">0.00</span>
+        </div>
+        <input type="text" class="form-control precioporunidad" name="precioporunidad" id="precioporunidad" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)">
+        </div>
+        
+        <label for="">tasapago:</label><br>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">$</span>
+        <span class="input-group-text">0.00</span>
+        </div>
+        <input type="text" class="form-control tasapago" name="tasapago" id="tasapago" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['tasapago']}}" required oninput="multiplicacion(this)">
+        </div>
+        
+        
+
+        <label for="">TasaBCV Hoy:</label>
+        
+        <div><span>BCV.
+        <input class="tasapagohoy" type="text" name="tasapagohoy" id="tasapagohoy"
+        value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" readonly>
         </span></div>
 
         
-        <label for="">tasapago:</label><br>
-        <div><span>Bs.
-        <input class="tasapago" type="text" name="tasapago" id="tasapago"
-        value="{{productos['tasapago']}}" readonly required oninput="multiplicacion(this)"> <br><br>
-        </span></div>
-
-        <label for="">TasaBCV Hoy:</label>
-        <div><span>BCV.
-        <input class="tasapagohoy" type="text" name="tasapagohoy" id="tasapagohoy"
-        value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}">
-        </span></div>
         
         <label for="">precio en USD $:</label><br>
         <div><span>USD $.
@@ -95,12 +98,20 @@
         required oninput="multiplicacion(this)"> <br><br>
         </span></div>
 
-        
+        <div>
         <label for="">Precio de Venta:</label><br>
         <div><span>Bs.
         <input class="precio-venta" type="number" name="precio-venta" id="precio-venta"
         value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"> <br><br>
         </span></div>
+        </div>
+
+        <div>
+        <label for="">Porcentaje de ganancia%</label>
+        <span>%
+        <input class="porcentajeCV" type="text" name="porcentajecompraventa" id="porcentajecompraventa">
+        </span>
+        </div>
 
         <label for="">Ganancia estimadaD:</label><br>
         <div><span>USD $.
@@ -115,10 +126,17 @@
         </span></div>
 
         <label for="">Ganancia estimadaBs:</label><br>
-        <div><span>Bs.
-        <input class="gananciaBs" type="text" name="gananciaBs" id="gananciaBs"
-        value="{{productos['ganancia_estimadaD']}}" oninput="multiplicacion(this)">  <br><br>
-        </span></div>
+  
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">$</span>
+        <span class="input-group-text">0.00</span>
+        </div>
+        <input type="text" class="form-control ganaciaBs" name="ganaciaBs" id="ganaciaBs" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['ganancia_estimadaBs']}}" required oninput="multiplicacion(this)">
+        </div>
+
+        
 
             <button type="submit">Guardar</button>
             <button>

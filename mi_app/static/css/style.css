@@ -1,5 +1,6 @@
 @import url("mostrador.css");
 @import url("editar.css");
+@import url("editarlistado.css");
 
 .contenedor-formularios {
     display: flex;

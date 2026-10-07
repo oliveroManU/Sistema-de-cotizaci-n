@@ -20,7 +20,7 @@
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('listado') }}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
@@ -38,28 +38,40 @@
 </header>
 
 <div  class="contenedor-formularios">
-    <div class="form-group rounded-top border-success rounded-top">
+    <div class="form-group rounded-top rounded-top">
     <h1>editar</h1>
-    <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">
 
+       <h4>Lote {{productos['id']}}</h4>
        <h2>{{productos['nombre']}}</h2>
        <h3>{{productos['marca']}}</h3>
+    
+       <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">      
 
         <label for="">Precio:</label><br>
-        <div><span>Bs.
-        <input class="precio-producto" type="text" name="precio-producto" id="precio"
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">BCV</span>
+        <span class="input-group-text">Bs.</span>
+        </div>
+        <input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
         value="{{productos['precio']}}" required oninput="multiplicacion(this)" > <br><br>
-        </span></div>
+        </div>
 
         <label for="">cantidad:</label><br>
-        <input class="cantidad-producto" type="text" name="cantidad-producto" id="cantidad-producto"
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">+</span>
+        <span class="input-group-text">-</span>
+        </div>
+        <input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
         value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> <br><br>
-    
+        </div>
+
         <label for="">Precio por unidad:</label><br>
         <div class="input-group mb-3">
         <div class="input-group-prepend">
-        <span class="input-group-text">$</span>
-        <span class="input-group-text">0.00</span>
+        <span class="input-group-text">BCV.</span>
+        <span class="input-group-text">Bs.</span>
         </div>
         <input type="text" class="form-control precioporunidad" name="precioporunidad" id="precioporunidad" aria-label="Amount (to the nearest dollar)"
         value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)">
@@ -68,90 +80,133 @@
         <label for="">tasapago:</label><br>
         <div class="input-group mb-3">
         <div class="input-group-prepend">
-        <span class="input-group-text">$</span>
-        <span class="input-group-text">0.00</span>
+        <span class="input-group-text">BCV.</span>
+        <span class="input-group-text">Bs.</span>
         </div>
         <input type="text" class="form-control tasapago" name="tasapago" id="tasapago" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['tasapago']}}" required oninput="multiplicacion(this)">
+        value="{{productos['tasapago']}}" required oninput="multiplicacion(this)" readonly>
         </div>
         
         
 
         <label for="">TasaBCV Hoy:</label>
         
-        <div><span>BCV.
-        <input class="tasapagohoy" type="text" name="tasapagohoy" id="tasapagohoy"
-        value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" readonly>
-        </span></div>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">BCV</span>
+        <span class="input-group-text">Bs.</span>
+        </div>
+        <input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+        value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" readonly >
+        </div>
 
         
         
         <label for="">precio en USD $:</label><br>
-        <div><span>USD $.
-        <input class="preciod" type="text" name="preciod" id="preciod"
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">USD</span>
+        <span class="input-group-text">$</span>
+        </div>
+        <input class="preciod form-control" type="text" name="preciod" id="preciod"
         value="{{productos['precioD']}}" required oninput="multiplicacion(this)"> <br><br>
-        </span></div>
+        </div>
 
         <label for="">precio en USD $ hoy:</label><br>
-        <div><span>USD $.
-        <input class="preciod1" type="text" name="preciod1" id="preciod1"
-        required oninput="multiplicacion(this)"> <br><br>
-        </span></div>
+        
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">USD</span>
+        <span class="input-group-text">$</span>
+        </div>
+        <input type="text" class="form-control preciod1" name="preciod1" id="preciod1" aria-label="Amount (to the nearest dollar)"
+        required readonly>
+        </div>
 
-        <div>
+        
         <label for="">Precio de Venta:</label><br>
-        <div><span>Bs.
-        <input class="precio-venta" type="number" name="precio-venta" id="precio-venta"
-        value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"> <br><br>
-        </span></div>
+        
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">BCV.</span>
+        <span class="input-group-text">Bs.</span>
+        </div>
+        <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)">
         </div>
 
-        <div>
-        <label for="">Porcentaje de ganancia%</label>
-        <span>%
-        <input class="porcentajeCV" type="text" name="porcentajecompraventa" id="porcentajecompraventa">
-        </span>
+                 
+        <label for="">Porcentaje de ganancia</label>
+        
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        
+        <span class="input-group-text">%</span>
+        </div>
+        <input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+        required oninput="multiplicacion(this)" readonly> 
         </div>
 
-        <label for="">Ganancia estimadaD:</label><br>
-        <div><span>USD $.
-        <input class="gananciaD" type="text" name="gananciaD" id="gananciaD"
-        value="{{productos['ganancia_estimadaD']}}"  oninput="multiplicacion(this)"> <br><br>
-        </span></div>
+
+        <label for="">Ganancia estimada dia de compra</label><br>
+
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">USD</span>
+        <span class="input-group-text">$</span>
+        </div>
+        <input type="text" class="form-control gananciaD" name="gananciaD" id="gananciaD" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['ganancia_estimadaD']}}" required oninput="multiplicacion(this)" readonly>
+        </div>
 
         <label for="">Valor actual del producto en USD $.:</label><br>
-        <div><span>USD $.
-        <input class="ValorActualD" type="text" name="ValorActualD" id="ValorActualD"
-        oninput="multiplicacion(this)"> <br><br>
-        </span></div>
 
-        <label for="">Ganancia estimadaBs:</label><br>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">USD</span>
+        <span class="input-group-text">$</span>
+        </div>
+        <input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" aria-label="Amount (to the nearest dollar)"
+        required oninput="multiplicacion(this)" readonly>
+        </div>
+
+       
+
+        <label for="">Ganancia estimada dia de compra:</label><br>
   
         <div class="input-group mb-3">
         <div class="input-group-prepend">
-        <span class="input-group-text">$</span>
-        <span class="input-group-text">0.00</span>
+        <span class="input-group-text">BCV</span>
+        <span class="input-group-text">Bs.</span>
         </div>
-        <input type="text" class="form-control ganaciaBs" name="ganaciaBs" id="ganaciaBs" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['ganancia_estimadaBs']}}" required oninput="multiplicacion(this)">
+        <input type="text" class="form-control gananciaBs" name="gananciaBs" id="gananciaBs" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['ganancia_estimadaBs']}}" required oninput="multiplicacion(this)" readonly>
         </div>
 
         
 
-            <button type="submit">Guardar</button>
-            <button>
-                <a href="{{ url_for('listado')}}">cancelar</a>
+            <button type="submit" class="btn btn-outline-info">Guardar</button>
+            <button class="btn btn-outline-danger boton-decoracion" >
+                <a class="boton-decoracion" href="{{ url_for('listado')}}">cancelar</a>
             </button>
     </div>
-        <div>
-            <img class="editar-img" src="{{ url_for('static', filename='img/product/' + productos['id']|string + '.jpg') }}" class="card-img-top" alt="...">
-        </div>
 
-
-        
     </form>
-</div>
+    
 
+
+    
+        <div class="card form-group" style="width: 18rem; height: 55%;">
+            <img class="editar-img" src="{{ url_for('static', filename='img/product/' + productos['id']|string + '.jpg') }}" class="card-img-top" alt="...">
+         <div class="card-body">
+            <h5 class="card-title"></h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+         </div>
+        </div>
+        
+    
+</div>
 
 </body>
 </html>

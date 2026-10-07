@@ -39,7 +39,9 @@
 <div class="contenedor-formularios">
   <div  class="rounded-top border-success rounded-top" >
     <form  action="{{ url_for('cotizacion_int') }}" method="POST" >
-        <table style=" margin-left: auto; margin-right: auto;" class="table table-striped table-bordered bg-white table-sm ">
+       
+
+        <table  class="table table-striped table-bordered bg-white table-sm ">
             <thead class="thead-dark">
                 <tr>
                     <th>Producto</th>
@@ -64,11 +66,29 @@
                     <td><input class="form-control cantidad-producto" type="number" oninput="multiplicacion(this)" name="cantidad-producto"></td>
                     <td><input class="form-control precioporunidad" type="text" name="precioporunidad" readonly></td>
                     <td><input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" oninput="multiplicacion(this)" readonly></td>      
-                    <td><div><span>$</span><input class="form-control preciod " type="text" name="preciod" oninput="multiplicacion(this)"></td></div>
-                    <td><div><span>Bs.</span><input class="form-control precio-venta " type="text" name="precio-venta" oninput="multiplicacion(this)"></div></td>    
-                    <td><div><span>$</span><input class="form-control preciod gananciaD " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly></td></div>
-                    <td><div><span>Bs.</span><input class="form-control precio-venta gananciaBs " type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                     
-                    <td><button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button></td>
+                    <td><div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text">BCV</span>        
+                        </div>
+                        <input class="form-control preciod " type="text" name="preciod" oninput="multiplicacion(this)"></div></td>
+                    <td><div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text">BCV</span></div>
+                        <input class="form-control precio-venta " type="text" name="precio-venta" oninput="multiplicacion(this)"></div></td>    
+                    <td><div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text">BCV</span>        
+                        </div><input class="form-control preciod gananciaD " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly> </div> </td>
+                    <td><div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text">BCV</span>        
+                        </div><input class="form-control precio-venta gananciaBs " type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                     
+                    
+                    
+                    <td>
+                      
+                      
+                      <button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button></td>
                 </tr>
             </tbody>
             

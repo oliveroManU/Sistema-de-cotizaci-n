@@ -134,8 +134,8 @@ def actualizar_productos1(productos_id):
         with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute(
-                'UPDATE productos SET nombre = ?, marca = ?, precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, moneda = ?, precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? WHERE id = ? ',
-                (nombre, marca, precio, cantidad, preciounidad, tasapago, moneda, preciod, precioventa, gananciaD, gananciaBs, productos_id)
+                'UPDATE productos SET precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? WHERE id = ? ',
+                (precio, cantidad, preciounidad, tasapago, preciod, precioventa, gananciaD, gananciaBs, productos_id)
             )           
             conn.commit()
     

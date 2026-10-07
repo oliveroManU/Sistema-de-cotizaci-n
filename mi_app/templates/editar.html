@@ -20,7 +20,7 @@
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('listado') }}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
@@ -38,28 +38,46 @@
 </header>
 
 <div  class="contenedor-formularios">
-    <div class="form-group rounded-top border-success rounded-top">
+    <div class="form-group rounded-top">
+      <div>
     <h1>editar</h1>
     <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['id'])}}">
 
         <label for="">nombre:</label><br>
-        <input type="text" name="nombre" id="nombre"  value="{{producto['nombre']}}" required> <br><br>
+        <input type="text" class="form-control" name="nombre" id="nombre"  value="{{producto['nombre']}}" required> 
+       
+        <label for="">Marca:</label><br>
+        <input type="text" class="form-control" name="marca" id="marca" value="{{producto['marca']}}">
+        
+        <label for="">Precio:</label><br>       
+        <input type="text" class="form-control" name="precio" id="precio" step="0.01" value="{{producto['precio']}}" required>         
 
-        <label for="">Precio:</label><br>
-        <input type="text" name="precio" id="precio" step="0.01" value="{{producto['precio']}}" required> <br><br>
+        <label for="">Cantidad:</label><br>
+        <input type="number" class="form-control" name="cantidad" id="cantidad" value="{{producto['cantidad']}}"> <br><br>
 
-            <button type="submit">Guardar</button>
-            <button>
-                <a href="{{ url_for('mostrador') }}">cancelar</a>
-            </button>
+      </div>  
+
+      <button class="btn btn-outline-info" type="submit">Guardar</button>
+        <button class="btn btn-outline-danger " ><a class="text-decoration-none boton-cancelar-editar" style="color: red;" href="{{ url_for('mostrador') }}">Cancelar</a></button>
+
     </div>
-        <div>
-            <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" class="card-img-top" alt="...">
-        </div>
+
+        
+        
+
+        
 
 
         
     </form>
+        <div class="card form-group" style="width: 18rem; height: 55%;">
+            <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" class="card-img-top" alt="...">
+         <div class="card-body">
+            <h5 class="card-title"></h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+         </div>
+        </div>
 </div>
 </body>
 </html>

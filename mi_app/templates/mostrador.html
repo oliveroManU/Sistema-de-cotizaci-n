@@ -18,13 +18,13 @@
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('listado') }}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Productos</a>
+          <a class="nav-link" href="{{ url_for('mostrador') }}">Productos</a>
         </li>
       </ul>
       <span class="navbar-text">
@@ -51,8 +51,9 @@
         </a>
             <div class="card-body">
                 <h2>{{ producto.nombre }}</h2>
+                <h5>{{ producto.marca }}</h5>
                 <h4>Precio: ${{ producto.precio }}</h4>
-                <h4>cantidad</h4>
+                <h6>cantidad: {{ producto.cantidad }}</h4>
             </div>
         </div>
 

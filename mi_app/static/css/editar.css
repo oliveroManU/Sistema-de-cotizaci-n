@@ -2,3 +2,26 @@
     max-width: 350px;
     max-height: 400px;
 }
+
+.tarjetadecambio{
+    background-color: #E8F5E9;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.boton-cancelar-editar{
+    color: red;
+}
+
+.boton-cancelar-editar:hover{
+    color: whitesmoke;
+}

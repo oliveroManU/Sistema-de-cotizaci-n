@@ -19,10 +19,10 @@
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('listado') }}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Registro</a>
+          <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('mostrador') }}">Productos</a>
@@ -36,8 +36,8 @@
 </nav>
 </header>
 
-<div class="contenedor-formularios">
-  <div  class="rounded-top border-success rounded-top" >
+<div class="contenedor-formularios" style="width: 97%;">
+  <div  class="rounded-top  rounded-top" >
     <form  action="{{ url_for('cotizacion_int') }}" method="POST" >
        
 
@@ -57,7 +57,7 @@
                     <th>Total en bolivares</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody style="height: 200px;" >
                 <tr>
                     <td><input class="form-control" type="text" name="nombre"></td>
                     <td><input class="form-control" type="text" name="marca"></td>

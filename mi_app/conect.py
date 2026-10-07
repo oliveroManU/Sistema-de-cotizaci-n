@@ -50,13 +50,15 @@ def editar_producto(producto_id):
 @app.route('/producto/<int:producto_id>', methods=['POST'])
 def actualizar_producto(producto_id):
     nombre = request.form.get('nombre')
+    marca = request.form.get('marca')
     precio = request.form.get('precio')
+    cantidad = request.form.get('cantidad')
     
     with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(
-            'UPDATE productos SET nombre = ?, precio = ? WHERE id = ? ',
-            (nombre, precio, producto_id)
+            'UPDATE productos SET nombre = ?, precio = ?, marca = ?, cantidad = ? WHERE id = ? ',
+            (nombre, precio, marca, cantidad, producto_id)
         )
         
     conn.commit()

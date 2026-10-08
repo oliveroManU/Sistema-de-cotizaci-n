@@ -15,7 +15,7 @@ function multiplicacion(elemento) {
     const TasaPagoProducto = parseFloat(fila.querySelector('.tasapago').value) || 0;
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
 
-    const ValorPorUnidad = PrecioProducto / CantidadProducto;
+    const ValorPorUnidad = CantidadProducto !==0 ? PrecioProducto / CantidadProducto : 0;
     const PrecioCompra = (PrecioProducto  / TasaPagoProducto);
     const total = ((PrecioVenta - PrecioProducto)/(TasaPagoProducto));
     const total2 = PrecioVenta - PrecioProducto;  

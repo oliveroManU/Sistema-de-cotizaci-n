@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+from PIL import Image
 import os
 import sqlite3
 import requests
@@ -11,6 +12,9 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+# Carpeta destino
+UPLOAD_FOLDER = os.path.join('static', 'img', 'productos')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True) 
 
 DB_PATH = os.path.join(basedir, 'Velazcress.db')
 
@@ -66,6 +70,40 @@ def actualizar_producto(producto_id):
     
     
     return redirect(url_for('mostrador'))
+
+@app.route('/producto/<int:producto_id>/imagen', methods=['POST'])
+def subir_imagen(producto_id):
+    archivo = request.files.get('imagen')
+
+    if not archivo or archivo.filename == '':
+        flash('No seleccionaste ninguna imagen')
+        return redirect(url_for('editar_producto', producto_id=producto_id))
+
+    try:
+        # 1. Abrir la imagen con Pillow
+        img = Image.open(archivo)
+
+        # 2. Convertir a RGB (JPG no admite transparencia ni CMYK)
+        if img.mode in ('RGBA', 'LA', 'P'):
+            fondo = Image.new('RGB', img.size, (255, 255, 255))
+            fondo.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
+            img = fondo
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+
+        # 3. Nombre final: {id}.jpg
+        nombre_final = f'{producto_id}.jpg'
+        ruta_final = os.path.join(UPLOAD_FOLDER, nombre_final)
+
+        # 4. Guardar siempre como JPG
+        img.save(ruta_final, 'JPEG', quality=90)
+
+        flash('Imagen actualizada')
+    except Exception as e:
+        flash(f'Error al procesar la imagen: {e}')
+
+    return redirect(url_for('editar_producto', producto_id=producto_id))
+
 
 @app.route('/cotizacion_int', methods=['GET','POST'])
 def cotizacion_int():

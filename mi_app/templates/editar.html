@@ -73,9 +73,20 @@
         <div class="card form-group" style="width: 18rem; height: 55%;">
             <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" class="card-img-top" alt="...">
          <div class="card-body">
+
+            
+
             <h5 class="card-title"></h5>
             <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+
             <a href="#" class="btn btn-primary">Go somewhere</a>
+            <form method="POST" action="{{ url_for('subir_imagen', producto_id=producto['id']) }}" enctype="multipart/form-data">
+            
+            <input type="file" name="imagen" id="imagen" accept="image/*" required style="display:none;">
+            <label for="imagen" class="btn btn-primary btn-sm btn-block mb-2"> Seleccionar imagen</label>
+            
+            <button type="submit" class="btn btn-primary">Cambiar imagen</button>
+</form>
          </div>
         </div>
 </div>

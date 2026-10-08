@@ -38,10 +38,13 @@
 
 <div class="contenedor-formularios" style="width: 97%;">
   <div  class="rounded-top  rounded-top" >
+
+    <h1 class="h1-insert" >Registro de producto</h1>
+
     <form  action="{{ url_for('cotizacion_int') }}" method="POST" >
        
 
-        <table  class="table table-striped table-bordered bg-white table-sm ">
+        <table  class="table table-striped table-bordered bg-white table-sm" style="margin-left: 0%;">
             <thead class="thead-dark">
                 <tr>
                     <th>Producto</th>
@@ -53,17 +56,17 @@
                     <th>Tasapago</th>
                     <th>Conversion</th>
                     <th>Precio de venta</th>
-                    <th>Total en divisa</th>
-                    <th>Total en bolivares</th>
+                    <th>Total</th>
+                    
                 </tr>
             </thead>
             <tbody style="height: 200px;" >
                 <tr>
                     <td><input class="form-control" type="text" name="nombre"></td>
                     <td><input class="form-control" type="text" name="marca"></td>
-                    <td><input class="form-control" type="text" name="moneda" value="Bs." readonly></td>
+                    <td><input class="form-control input-corto-insersion" style="width: 55px;" type="text" name="moneda" value="Bs." readonly></td>
                     <td><input class="form-control precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto"></td>
-                    <td><input class="form-control cantidad-producto" type="number" oninput="multiplicacion(this)" name="cantidad-producto"></td>
+                    <td><input class="form-control input-corto-insersion cantidad-producto" style="width: 55px;" type="number" min="1" value="1" oninput="multiplicacion(this)" name="cantidad-producto" ></td>
                     <td><input class="form-control precioporunidad" type="text" name="precioporunidad" readonly></td>
                     <td><input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" oninput="multiplicacion(this)" readonly></td>      
                     <td><div class="input-group mb-3">
@@ -75,27 +78,26 @@
                         <div class="input-group-prepend">
                         <span class="input-group-text">BCV</span></div>
                         <input class="form-control precio-venta " type="text" name="precio-venta" oninput="multiplicacion(this)"></div></td>    
+                    
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
                         <span class="input-group-text">BCV</span>        
-                        </div><input class="form-control preciod gananciaD " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly> </div> </td>
-                    <td><div class="input-group mb-3">
+                        </div><input class="form-control preciod gananciaD " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly> </div> 
+                        <div class="input-group mb-3">
                         <div class="input-group-prepend">
                         <span class="input-group-text">BCV</span>        
-                        </div><input class="form-control precio-venta gananciaBs " type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                     
+                        </div><input class="form-control precio-venta gananciaBs " type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                       
                     
-                    
-                    <td>
                       
                       
-                      <button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button></td>
+                      
                 </tr>
             </tbody>
             
  
     
         </table>
-        
+        <button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button>
     </form>
   </div>
 

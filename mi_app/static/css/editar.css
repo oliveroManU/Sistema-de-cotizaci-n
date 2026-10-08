@@ -25,3 +25,7 @@ input[type="number"] {
 .boton-cancelar-editar:hover{
     color: whitesmoke;
 }
+
+.buttons-card-editar{
+    width: 150px; margin-top: 5px;
+}

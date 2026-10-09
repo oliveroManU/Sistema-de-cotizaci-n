@@ -105,25 +105,28 @@ def subir_imagen(producto_id):
 def cotizacion_int():
     tasa_bcv_dolar = obtener_tasa_bcv("dolar")
     tasa_bcv_euro = obtener_tasa_bcv("euro")
-    nombre = request.form.get('nombre')
-    marca = request.form.get('marca')
-    precio = float(request.form.get('precio-producto', 0))
-    cantidad = int(request.form.get('cantidad-producto', 0))
-    preciounidad = float(request.form.get('precioporunidad', 0))
-    tasapago = float(request.form.get('tasapago', 0))
-    moneda =  request.form.get('moneda')
-    preciod = float(request.form.get('preciod', 0))
-    precioventa = float(request.form.get('precio-venta', 0))
-    gananciaD = float(request.form.get('gananciaD', 0))
-    gananciaBs =  float(request.form.get('gananciaBs', 0))
     conn = sqlite3.connect('Velazcress.db')
-    conn.row_factory = sqlite3.Row
-    productos = conn.execute("SELECT * FROM productos").fetchall()
+    conn.row_factory = sqlite3.Row          
     cursor = conn.cursor()
-    cursor.execute('INSERT INTO productos (nombre, marca, precio, cantidad, precioporunidad, moneda, tasapago, precioD, precio_venta, ganancia_estimadaD, ganancia_estimadaBs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+    if request.method == 'POST':
+        
+        nombre = request.form.get('nombre')
+        marca = request.form.get('marca')
+        precio = float(request.form.get('precio-producto', 0))
+        cantidad = int(request.form.get('cantidad-producto', 0))
+        preciounidad = float(request.form.get('precioporunidad', 0))
+        tasapago = float(request.form.get('tasapago', 0))
+        moneda =  request.form.get('moneda')
+        preciod = float(request.form.get('preciod', 0))
+        precioventa = float(request.form.get('precio-venta', 0))
+        gananciaD = float(request.form.get('gananciaD', 0))
+        gananciaBs =  float(request.form.get('gananciaBs', 0))
+        
+        cursor.execute('INSERT INTO productos (nombre, marca, precio, cantidad, precioporunidad, moneda, tasapago, precioD, precio_venta, ganancia_estimadaD, ganancia_estimadaBs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                    (nombre, marca, precio, cantidad, preciounidad, moneda, tasapago, preciod, precioventa, gananciaD, gananciaBs  ))
-    conn.commit()
-    conn.close()
+        conn.commit()
+    productos = conn.execute("SELECT * FROM productos").fetchall()  
+    conn.close()  
     return render_template('insersion.html', tasa_bcv_dolar=tasa_bcv_dolar, tasa_bcv_euro=tasa_bcv_euro, productos=productos)
 
 @app.route('/listado')

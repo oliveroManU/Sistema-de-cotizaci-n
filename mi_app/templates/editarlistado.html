@@ -39,11 +39,12 @@
 
 <div  class="contenedor-formularios">
     <div class="form-group rounded-top rounded-top">
-    <h1>editar</h1>
+    
 
-       <h4>Lote {{productos['id']}}</h4>
-       <h2>{{productos['nombre']}}</h2>
-       <h3>{{productos['marca']}}</h3>
+       <h6 class="h6-lote-EditList" >Lote #{{productos['id']}}</h4>
+       <h1 class="h1-producto-EditList">{{productos['nombre']}}</h2>
+       <h3 class="h3-marca-EditList">{{productos['marca']}}</h3>
+       
     
        <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">      
 
@@ -97,7 +98,7 @@
         <span class="input-group-text">Bs.</span>
         </div>
         <input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
-        value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" readonly >
+        value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly >
         </div>
 
         
@@ -172,7 +173,7 @@
 
        
 
-        <label for="">Ganancia estimada dia de compra:</label><br>
+        <label for="">Ganancia Bolivares:</label><br>
   
         <div class="input-group mb-3">
         <div class="input-group-prepend">

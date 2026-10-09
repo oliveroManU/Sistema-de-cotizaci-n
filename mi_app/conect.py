@@ -80,22 +80,18 @@ def subir_imagen(producto_id):
         return redirect(url_for('editar_producto', producto_id=producto_id))
 
     try:
-        # 1. Abrir la imagen con Pillow
+
         img = Image.open(archivo)
 
-        # 2. Convertir a RGB (JPG no admite transparencia ni CMYK)
         if img.mode in ('RGBA', 'LA', 'P'):
             fondo = Image.new('RGB', img.size, (255, 255, 255))
             fondo.paste(img, mask=img.split()[-1] if img.mode == 'RGBA' else None)
             img = fondo
         elif img.mode != 'RGB':
             img = img.convert('RGB')
-
-        # 3. Nombre final: {id}.jpg
+            
         nombre_final = f'{producto_id}.jpg'
         ruta_final = os.path.join(UPLOAD_FOLDER, nombre_final)
-
-        # 4. Guardar siempre como JPG
         img.save(ruta_final, 'JPEG', quality=90)
 
         flash('Imagen actualizada')
@@ -107,7 +103,8 @@ def subir_imagen(producto_id):
 
 @app.route('/cotizacion_int', methods=['GET','POST'])
 def cotizacion_int():
-    tasa_bcv = obtener_tasa_bcv()
+    tasa_bcv_dolar = obtener_tasa_bcv("dolar")
+    tasa_bcv_euro = obtener_tasa_bcv("euro")
     nombre = request.form.get('nombre')
     marca = request.form.get('marca')
     precio = float(request.form.get('precio-producto', 0))
@@ -123,12 +120,11 @@ def cotizacion_int():
     conn.row_factory = sqlite3.Row
     productos = conn.execute("SELECT * FROM productos").fetchall()
     cursor = conn.cursor()
-    ### anñadir : cantidad, moneda
     cursor.execute('INSERT INTO productos (nombre, marca, precio, cantidad, precioporunidad, moneda, tasapago, precioD, precio_venta, ganancia_estimadaD, ganancia_estimadaBs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
                    (nombre, marca, precio, cantidad, preciounidad, moneda, tasapago, preciod, precioventa, gananciaD, gananciaBs  ))
     conn.commit()
     conn.close()
-    return render_template('insersion.html', tasa_bcv=tasa_bcv, productos=productos)
+    return render_template('insersion.html', tasa_bcv_dolar=tasa_bcv_dolar, tasa_bcv_euro=tasa_bcv_euro, productos=productos)
 
 @app.route('/listado')
 def listado():
@@ -147,11 +143,12 @@ def editar_productos1(productos_id):
         cursor = conn.cursor()
         cursor = conn.execute('SELECT * FROM productos WHERE id = ?', (productos_id,))
         productos = cursor.fetchone()
-    tasa_bcv = obtener_tasa_bcv()
+    tasa_bcv_dolar = obtener_tasa_bcv("dolar")
+    tasa_bcv_euro = obtener_tasa_bcv("euro")
     
     if productos is None:
         return "Producto no encontrado", 404
-    return render_template('editarlistado.html', productos=productos, tasa_bcv=tasa_bcv)
+    return render_template('editarlistado.html', productos=productos, tasa_bcv_euro=tasa_bcv_euro, tasa_bcv_dolar=tasa_bcv_dolar)
 
 
 @app.route('/productos/<int:productos_id>', methods=['POST'])
@@ -204,7 +201,11 @@ def eliminar_producto1(productos_id):
     
 
 
-def obtener_tasa_bcv():
+def obtener_tasa_bcv(moneda="euro"):
+    """
+    Obtiene la tasa oficial del BCV.
+    moneda: 'euro' o 'dolar'
+    """
     url = 'https://www.bcv.org.ve'
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -217,15 +218,14 @@ def obtener_tasa_bcv():
 
         if respuesta.status_code == 200:
             soup = BeautifulSoup(respuesta.text, 'html.parser')
-            tasafinder = soup.find('div', id="dolar")
+            tasafinder = soup.find('div', id=moneda)  # 'euro' o 'dolar'
             if tasafinder:
                 strong = tasafinder.find('strong', class_='strong-tb')
                 if strong:
                     cuptext = strong.get_text(strip=True)
-                    numberbcv = float(cuptext.replace(",", "."))
-                    return numberbcv
+                    return float(cuptext.replace(",", "."))
     except Exception as e:
-        print(f"Error al obtener tasa BCV: {e}")
+        print(f"Error al obtener tasa BCV ({moneda}): {e}")
     return None
 
 

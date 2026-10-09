@@ -67,25 +67,53 @@
                     <td><input class="form-control input-corto-insersion" style="width: 55px;" type="text" name="moneda" value="Bs." readonly></td>
                     <td><input class="form-control precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto"></td>
                     <td><input class="form-control input-corto-insersion cantidad-producto" style="width: 55px;" type="number" min="1" value="1" oninput="multiplicacion(this)" name="cantidad-producto" ></td>
-                    <td><input class="form-control precioporunidad" type="text" name="precioporunidad" readonly></td>
-                    <td><input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" oninput="multiplicacion(this)" readonly></td>      
+                    
+
+                    <td>
+                    <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                    <span class="input-group-text">Bs</span>        
+                    </div>    
+                    <input class="form-control precioporunidad" type="text" name="precioporunidad" readonly> </div> </td>
+                    
+                    
+                    <td>
+                      <div class="input-group mb-3">
+                      <div class="input-group-prepend">
+                      <span class="input-group-text">$</span>        
+                      </div>      
+                      <input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" oninput="multiplicacion(this)" readonly></div>
+                        
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text">€</span>        
+                        </div>    
+                      <input class="form-control tasapagoE" type="text" name="tasapagoE" value="{{ '%.2f'|format(tasa_bcv_euro) if tasa_bcv_euro else '' }}" oninput="multiplicacion(this)" readonly> </div></td>      
+                    
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">BCV</span>        
+                        <span class="input-group-text">$</span>        
                         </div>
-                        <input class="form-control preciod " type="text" name="preciod" oninput="multiplicacion(this)"></div></td>
+                        <input class="form-control preciod " type="text" name="preciod" oninput="multiplicacion(this)"></div>
+
+                        <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text">€</span>        
+                        </div>
+                        <input class="form-control precioe " type="text" name="precioe" oninput="multiplicacion(this)"></div></td>
+
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">BCV</span></div>
+                        <span class="input-group-text">Bs</span></div>
                         <input class="form-control precio-venta " type="text" name="precio-venta" oninput="multiplicacion(this)"></div></td>    
                     
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">BCV</span>        
+                        <span class="input-group-text">$</span>        
                         </div><input class="form-control preciod gananciaD " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly> </div> 
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">BCV</span>        
+                        <span class="input-group-text">Bs</span>        
                         </div><input class="form-control precio-venta gananciaBs " type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                       
                     
                       

@@ -3,3 +3,26 @@
     outline: none;
     -webkit-tap-highlight-color: transparent;
 }
+
+.h6-lote-EditList{
+    color: #858585;
+    text-align: right;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin-right: 5%;
+}
+
+
+.h1-producto-EditList{
+    font-size: 70px;
+    margin-left: 5%;
+    margin-bottom: 20px;
+    color: #858585;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.h3-marca-EditList{
+    margin-left: 5%;
+    margin-bottom: 20px;
+    color: #858585;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}

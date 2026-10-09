@@ -77,15 +77,15 @@
             
 
             <h5 class="card-title"></h5>
-            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+            <p class="card-text">insertar descripcion</p>
 
-            <a href="#" class="btn btn-primary">Go somewhere</a>
+            <a href="#" class="btn btn-primary buttons-card-editar">cambiar descripcion</a>
             <form method="POST" action="{{ url_for('subir_imagen', producto_id=producto['id']) }}" enctype="multipart/form-data">
             
             <input type="file" name="imagen" id="imagen" accept="image/*" required style="display:none;">
-            <label for="imagen" class="btn btn-primary btn-sm btn-block mb-2"> Seleccionar imagen</label>
+            <label for="imagen" class="btn btn-primary btn-sm btn-block mb-2 buttons-card-editar"> Seleccionar imagen</label>
             
-            <button type="submit" class="btn btn-primary">Cambiar imagen</button>
+            <button type="submit" class="btn btn-primary buttons-card-editar">Cambiar imagen</button>
 </form>
          </div>
         </div>

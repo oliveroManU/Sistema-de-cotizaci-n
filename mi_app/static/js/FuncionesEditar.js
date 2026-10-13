@@ -6,6 +6,15 @@ function multiplicacion(elemento) {
     const TasaPagoProducto = parseFloat(fila.querySelector('.tasapago').value) || 0;
     const TasaPagoProductoHoy = parseFloat(fila.querySelector('.tasapagohoy').value) || 0;
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
+    const PorcentajeDeGanancia = parseFloat(fila.querySelector('.porcentajeCV').value) || 0;
+     if (elemento.classList.contains('porcentajeCV')) {
+        const nuevoPrecioVenta = PrecioProducto * (1 + PorcentajeDeGanancia / 100);
+        fila.querySelector('.precio-venta').value = nuevoPrecioVenta.toFixed(2);
+    }
+
+    // Ahora sí, leemos el precio de venta (ya actualizado si venía del %)
+    const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
+
 
     const ValorPorUnidad = CantidadProducto !== 0 ? PrecioProducto / CantidadProducto : 0;
     const PrecioDolares = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProducto) : 0;
@@ -13,8 +22,9 @@ function multiplicacion(elemento) {
     const total = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProducto)) : 0;
     const total2 = PrecioVenta - PrecioProducto;  
     const PorcentajeValorActualDolar = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProductoHoy)) : 0;
-    const PorcentajeCompraVenta =  ((PrecioVenta - PrecioProducto) / PrecioProducto) * 100 
     const PorcentajeDevaluacion = ((TasaPagoProductoHoy - TasaPagoProducto)/TasaPagoProducto)*100
+    const PorcentajeDeGananciaSobreCosto = (PrecioProducto*(1 + PorcentajeDeGanancia))
+    const MargendeGanancia = ((PorcentajeDeGananciaSobreCosto - PrecioProducto)/PorcentajeDeGananciaSobreCosto)*100
     
 
     fila.querySelector('.precioporunidad').value = ValorPorUnidad.toFixed(2);
@@ -22,10 +32,14 @@ function multiplicacion(elemento) {
     fila.querySelector('.preciod1').value = PrecioDolaresHoy.toFixed(2);
     fila.querySelector('.gananciaD').value = total.toFixed(4);
     fila.querySelector('.gananciaBs').value = total2.toFixed(4);
-    fila.querySelector('.porcentajeCV').value = PorcentajeCompraVenta.toFixed(2);
     fila.querySelector('.ValorActualD').value = PorcentajeValorActualDolar.toFixed(4);
     fila.querySelector('.porcentajedevaluacion').value = PorcentajeDevaluacion.toFixed(2);
-    
+    fila.querySelector('.gananciasobrecosto').value = PorcentajeDeGananciaSobreCosto.toFixed(4); 
+    fila.querySelector('.margen-ganancia').value = MargendeGanancia.toFixed(4);   
 
     calcularTotalGeneral();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.precio-producto').forEach(multiplicacion);
+});

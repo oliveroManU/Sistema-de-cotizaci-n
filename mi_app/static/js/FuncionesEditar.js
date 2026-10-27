@@ -6,6 +6,7 @@ function multiplicacion(elemento) {
     const TasaPagoProducto = parseFloat(fila.querySelector('.tasapago').value) || 0;
     const TasaPagoProductoHoy = parseFloat(fila.querySelector('.tasapagohoy').value) || 0;
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
+    const Porcentaje = parseFloat(fila.querySelector('.porcentaje').value) || 0;
 
     const ValorPorUnidad = CantidadProducto !== 0 ? PrecioProducto / CantidadProducto : 0;
     const PrecioDolares = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProducto) : 0;
@@ -25,7 +26,6 @@ function multiplicacion(elemento) {
     fila.querySelector('.porcentajeCV').value = PorcentajeCompraVenta.toFixed(2);
     fila.querySelector('.ValorActualD').value = PorcentajeValorActualDolar.toFixed(4);
     fila.querySelector('.porcentajedevaluacion').value = PorcentajeDevaluacion.toFixed(2);
-    
 
     calcularTotalGeneral();
 }

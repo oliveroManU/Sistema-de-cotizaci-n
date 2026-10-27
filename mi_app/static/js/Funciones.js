@@ -1,3 +1,5 @@
+
+
 const inputnombrecliente = document.getElementById('nombre-cliente');
 
 inputnombrecliente.addEventListener('input', function() {

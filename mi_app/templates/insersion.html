@@ -6,10 +6,10 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="{{ url_for('static', filename='js/FuncionesInsert.js') }}" defer></script>
-    <title>Document</title>
+    <title>Registro de productos</title>
 </head>
-<body style="margin: 0;" >
-<header>
+<body style="margin: 0; background-color: #F1F5F9;" >
+<header style="background-color: whitesmoke;">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">Velazcres</a>
@@ -41,7 +41,7 @@
 
     <h1 class="h1-insersion" >Registro de producto</h1>
 
-    <form  action="{{ url_for('cotizacion_int') }}" method="POST" >
+    <form id="form"  action="{{ url_for('cotizacion_int') }}" method="POST" >
        
 
         <table  class="table table-striped table-bordered bg-white table-sm" style="margin-left: 0%; font-size: 12px;">
@@ -62,59 +62,59 @@
             </thead>
             <tbody style="height: 200px;" >
                 <tr style="font-size: 10px;" >
-                    <td><input class="form-control" type="text" name="nombre"></td>
-                    <td><input class="form-control" type="text" name="marca"></td>
-                    <td><input class="form-control input-corto-insersion" style="width: 55px;" type="text" name="moneda" value="Bs." readonly></td>
-                    <td><input class="form-control precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto"></td>
-                    <td><input class="form-control input-corto-insersion cantidad-producto" style="width: 55px;" type="number" min="1" value="1" oninput="multiplicacion(this)" name="cantidad-producto" ></td>
+                    <td><input class="form-control input-letra-ins nombre" type="text" name="nombre"></td>
+                    <td><input class="form-control input-letra-ins marca" type="text" name="marca"></td>
+                    <td><input class="form-control input-corto-insersion input-letra-ins" style="width: 55px;" type="text" name="moneda" value="Bs." readonly></td>
+                    <td><input class="form-control precio-producto input-letra-ins precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto"></td>
+                    <td><input class="form-control input-corto-insersion cantidad-producto input-letra-ins" style="width: 55px;" type="number" min="1" value="1" oninput="multiplicacion(this)" name="cantidad-producto" ></td>
                     
 
                     <td>
                     <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                    <span class="input-group-text">Bs</span>        
+                    <span class="input-group-text input-letra-ins">Bs</span>        
                     </div>    
-                    <input class="form-control precioporunidad" type="text" name="precioporunidad" readonly> </div> </td>
+                    <input class="form-control precioporunidad input-letra-ins"  type="text" name="precioporunidad" readonly> </div> </td>
                     
                     
                     <td>
                       <div class="input-group mb-3">
                       <div class="input-group-prepend">
-                      <span class="input-group-text">$</span>        
+                      <span class="input-group-text input-letra-ins input-letra-ins" >$</span>        
                       </div>      
-                      <input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" oninput="multiplicacion(this)" readonly></div>
+                      <input class="form-control tasapago input-letra-ins "  type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" oninput="multiplicacion(this)" readonly></div>
                         
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">€</span>        
+                        <span class="input-group-text input-letra-ins">€</span>        
                         </div>    
-                      <input class="form-control tasapagoE" type="text" name="tasapagoE" value="{{ '%.2f'|format(tasa_bcv_euro) if tasa_bcv_euro else '' }}" oninput="multiplicacion(this)" readonly> </div></td>      
+                      <input class="form-control tasapagoE input-letra-ins" type="text" name="tasapagoE" value="{{ '%.2f'|format(tasa_bcv_euro) if tasa_bcv_euro else '' }}" oninput="multiplicacion(this)" readonly> </div></td>      
                     
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">$</span>        
+                        <span class="input-group-text input-letra-ins">$</span>        
                         </div>
-                        <input class="form-control preciod " type="text" name="preciod" oninput="multiplicacion(this)"></div>
+                        <input class="form-control preciod input-letra-ins" type="text" name="preciod" oninput="multiplicacion(this)"></div>
 
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">€</span>        
+                        <span class="input-group-text input-letra-ins">€</span>        
                         </div>
-                        <input class="form-control precioe " type="text" name="precioe" oninput="multiplicacion(this)"></div></td>
+                        <input class="form-control precioe input-letra-ins"  type="text" name="precioe" oninput="multiplicacion(this)"></div></td>
 
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">Bs</span></div>
-                        <input class="form-control precio-venta " type="text" name="precio-venta" oninput="multiplicacion(this)"></div></td>    
+                        <span class="input-group-text input-letra-ins">Bs</span></div>
+                        <input class="form-control precio-venta input-letra-ins" type="text" name="precio-venta" oninput="multiplicacion(this)"></div></td>    
                     
                     <td><div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">$</span>        
-                        </div><input class="form-control preciod gananciaD " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly> </div> 
+                        <span class="input-group-text input-letra-ins">$</span>        
+                        </div><input class="form-control preciod gananciaD input-letra-ins " type="text" name="gananciaD" oninput="multiplicacion(this)" readonly> </div> 
                         <div class="input-group mb-3">
                         <div class="input-group-prepend">
-                        <span class="input-group-text">Bs</span>        
-                        </div><input class="form-control precio-venta gananciaBs " type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                       
+                        <span class="input-group-text input-letra-ins">Bs</span>        
+                        </div><input class="form-control precio-venta gananciaBs input-letra-ins" type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly></div></td>                       
                     
                       
                       
@@ -125,7 +125,11 @@
  
     
         </table>
-        <button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button>
+           <button style="margin-top: 15px;" 
+            class="btn btn-primary" 
+            type="submit">
+        Enviar
+    </button>
     </form>
   </div>
 
@@ -138,4 +142,43 @@
 
 
 </body>
+
+<!-- Modal de Confirmación -->
+<div class="modal fade" id="modalRegistro" tabindex="-1" role="dialog" aria-labelledby="modalRegistroLabel" aria-hidden="true">
+  <div class="modal-dialog mod*al-dialog-centered" role="document">
+    <div class="modal-content" style="border-radius: 12px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+      
+      <!-- Header Personalizado (Azul oscuro) -->
+      <div class="modal-header" style="background-color: #1E293B; color: white; border-radius: 12px 12px 0 0; border-bottom: none;">
+        <h5 class="modal-title" id="modalRegistroLabel" style="font-weight: 600;">
+          <i class="fas fa-box-open me-2"></i> Confirmar Registro
+        </h5>
+        <!-- Nota: Si usas Bootstrap 4 usa class="close" data-dismiss="modal". Si usas Bootstrap 5 usa class="btn-close btn-close-white" data-bs-dismiss="modal" -->
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" style="color: white; opacity: 0.8;">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body" style="padding: 24px; font-size: 16px; color: #334155;">
+        <p style="margin-bottom: 10px;">¿Estás seguro de que deseas registrar este producto en el inventario?</p>
+        <div style="background: #F1F5F9; padding: 12px; border-radius: 8px; font-size: 14px;">
+          <strong>Nota:</strong> Verifica que los precios y la cantidad sean correctos antes de guardar.
+        </div>
+      </div>
+
+      <!-- Footer con Botones -->
+      <div class="modal-footer" style="border-top: 1px solid #e2e8f0; padding: 16px 24px;">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" style="border-radius: 6px; padding: 8px 20px;">
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" id="btnConfirmarGuardar" style="background-color: #3B82F6; border: none; border-radius: 6px; padding: 8px 20px; font-weight: 500;">
+          <i class="fas fa-check me-1"></i> Sí, Registrar
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 </html>

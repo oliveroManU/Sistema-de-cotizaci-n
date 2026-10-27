@@ -40,20 +40,20 @@
 <div  class="contenedor-formularios">
     <div class="form-group rounded-top">
       <div>
-    <h1>editar</h1>
+    <h1>Edición</h1>
     <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['id'])}}">
 
         <label for="">nombre:</label><br>
-        <input type="text" class="form-control" name="nombre" id="nombre"  value="{{producto['nombre']}}" required> 
+        <input type="text" class="form-control nombre" name="nombre" id="nombre"  value="{{producto['nombre']}}" required> 
        
         <label for="">Marca:</label><br>
-        <input type="text" class="form-control" name="marca" id="marca" value="{{producto['marca']}}">
+        <input type="text" class="form-control marca" name="marca" id="marca" value="{{producto['marca']}}">
         
         <label for="">Precio:</label><br>       
-        <input type="text" class="form-control" name="precio" id="precio" step="0.01" value="{{producto['precio']}}" required>         
+        <input type="text" class="form-control precio" name="precio" id="precio" step="0.01" value="{{producto['precio']}}" required>         
 
         <label for="">Cantidad:</label><br>
-        <input type="number" class="form-control" name="cantidad" id="cantidad" value="{{producto['cantidad']}}"> <br><br>
+        <input type="number" class="form-control cantidad" name="cantidad" id="cantidad" value="{{producto['cantidad']}}"> <br><br>
 
       </div>  
 

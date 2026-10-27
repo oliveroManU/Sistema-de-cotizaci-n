@@ -1,11 +1,67 @@
-const inputnombrecliente = document.getElementById('nombre-producto');
+function validarFormulario() {
+    // Seleccionamos los inputs por su clase
+    const camposObligatorios = [
+        document.querySelector('.nombre'),
+        document.querySelector('.marca'),
+        document.querySelector('.precio-producto'),
+        document.querySelector('.cantidad-producto'),
+        document.querySelector('.precioporunidad'),
+        document.querySelector('.precio')
+    ];
 
-inputnombrecliente.addEventListener('input', function() {
+    let errores = [];
 
-    // Acepta solo letras
-    this.value = this.value.replace (/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');  
+    camposObligatorios.forEach(campo => {
+        // ⚠️ Protección: si el campo no existe, saltamos
+        if (!campo) {
+            console.warn("⚠️ Algún selector no encontró el elemento. Revisa las clases en el HTML.");
+            return;
+        }
 
+        campo.classList.remove('error'); // Quitar error previo
+        
+        if (campo.value.trim() === "") {
+            campo.classList.add('error'); // Borde rojo
+            // Usamos el placeholder o el name para el mensaje (más amigable)
+            errores.push(campo.placeholder || campo.name || 'campo');
+        }
+    });
+
+    if (errores.length > 0) {
+        alert("Faltan datos en: " + errores.join(", "));
+        return false;
+    }
+
+    return true;
+}
+
+// Asignar al botón ( verifica el ID real en tu HTML)
+document.getElementById('form').addEventListener('submit', function(e) {
+    // Si la validación falla, bloqueamos el envío
+    if (!validarFormulario()) {
+        e.preventDefault(); 
+
+        
+
+    }
+    
+    // Si pasa la validación, el navegador envía el formulario normalmente
 });
+
+if (boton) {
+    boton.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (validarFormulario()) {
+            console.log(" Validación exitosa. Guardando...");
+            // Aquí va tu código para guardar los datos
+            alert("¡Registro exitoso!");
+        }
+    });
+} else {
+    console.error(" No se encontró el botón. Revisa el ID en el HTML.");
+}
+
+
 
 function multiplicacion(elemento) {
     const fila = elemento.closest('form');

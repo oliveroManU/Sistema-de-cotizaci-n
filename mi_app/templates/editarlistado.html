@@ -144,8 +144,13 @@
         
         <span class="input-group-text">%</span>
         </div>
+<<<<<<< HEAD
         <input type="text" class="form-control porcentaje" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
         required oninput="multiplicacion(this)" readonly> 
+=======
+        <input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+        required oninput="multiplicacion(this)"> 
+>>>>>>> 12dd4d1fc98b3967652de2714ba3e320f9107df3
         </div>
 
 
@@ -184,7 +189,30 @@
         value="{{productos['ganancia_estimadaBs']}}" required oninput="multiplicacion(this)" readonly>
         </div>
 
-        
+
+        <label for="">Ganancia Sobre costo:</label><br>
+
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">USD</span>
+        <span class="input-group-text">$</span>
+        </div>
+        <input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)"
+        required oninput="multiplicacion(this)" readonly>
+        </div>
+
+       
+
+        <label for="">Margen de Ganancia:</label><br>
+  
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">BCV</span>
+        <span class="input-group-text">Bs.</span>
+        </div>
+        <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+        required oninput="multiplicacion(this)" readonly>
+        </div>
 
             <button type="submit" class="btn btn-outline-info">Guardar</button>
             <button class="btn btn-outline-danger boton-decoracion text-decoration-none" >

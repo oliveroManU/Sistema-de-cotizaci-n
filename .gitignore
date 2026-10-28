@@ -1,5 +1,10 @@
 .venv/
 .venv
 venv/
+venv
 ffgfg/
-
+ffgfg
+pycache
+pycache/
+Velazcress.db
+Velazcress.db/

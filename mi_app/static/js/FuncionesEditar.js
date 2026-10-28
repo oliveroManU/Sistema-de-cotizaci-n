@@ -30,6 +30,7 @@ function multiplicacion(elemento) {
     const PorcentajeDeGananciaSobreCosto = (PrecioProducto*(1 + PorcentajeDeGanancia))
     const MargendeGanancia = ((PorcentajeDeGananciaSobreCosto - PrecioProducto)/PorcentajeDeGananciaSobreCosto)*100
     
+    // Funciones
 
     fila.querySelector('.precioporunidad').value = ValorPorUnidad.toFixed(2);
     fila.querySelector('.preciod').value = PrecioDolares.toFixed(2);

@@ -75,7 +75,7 @@
         <span class="input-group-text">Bs.</span>
         </div>
         <input type="text" class="form-control precioporunidad" name="precioporunidad" id="precioporunidad" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)">
+        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)" readonly>
         </div>
         
         <label for="">tasapago:</label><br>
@@ -100,10 +100,30 @@
         <input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
         value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly >
         </div>
+                 
+        <label for="">Porcentaje de ganancia</label>
+        
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        
+        <span class="input-group-text">%</span>
+        </div>
+        <input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+        required oninput="multiplicacion(this)"> 
+        </div>
 
+        <label for="">Precio de Venta:</label><br>
         
-        
-        <label for="">precio en USD $:</label><br>
+        <div class="input-group mb-3">
+        <div class="input-group-prepend">
+        <span class="input-group-text">BCV.</span>
+        <span class="input-group-text">Bs.</span>
+        </div>
+        <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)">
+        </div>
+
+       <!-- <label for="">precio en USD $:</label><br>
         <div class="input-group mb-3">
         <div class="input-group-prepend">
         <span class="input-group-text">USD</span>
@@ -112,6 +132,9 @@
         <input class="preciod form-control" type="text" name="preciod" id="preciod"
         value="{{productos['precioD']}}" required oninput="multiplicacion(this)"> <br><br>
         </div>
+        -->
+
+        <!--
 
         <label for="">precio en USD $ hoy:</label><br>
         
@@ -125,35 +148,6 @@
         </div>
 
         
-        <label for="">Precio de Venta:</label><br>
-        
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV.</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)">
-        </div>
-
-                 
-        <label for="">Porcentaje de ganancia</label>
-        
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        
-        <span class="input-group-text">%</span>
-        </div>
-<<<<<<< HEAD
-        <input type="text" class="form-control porcentaje" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
-        required oninput="multiplicacion(this)" readonly> 
-=======
-        <input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
-        required oninput="multiplicacion(this)"> 
->>>>>>> 12dd4d1fc98b3967652de2714ba3e320f9107df3
-        </div>
-
-
         <label for="">Ganancia estimada dia de compra</label><br>
 
         <div class="input-group mb-3">
@@ -165,18 +159,17 @@
         value="{{productos['ganancia_estimadaD']}}" required oninput="multiplicacion(this)" readonly>
         </div>
 
-        <label for="">Valor actual del producto en USD $.:</label><br>
+        -->
+
+        <label for="">Ganancia en USD $.:</label><br>
 
         <div class="input-group mb-3">
         <div class="input-group-prepend">
         <span class="input-group-text">USD</span>
         <span class="input-group-text">$</span>
         </div>
-        <input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" aria-label="Amount (to the nearest dollar)"
-        required oninput="multiplicacion(this)" readonly>
+        <input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly>
         </div>
-
-       
 
         <label for="">Ganancia Bolivares:</label><br>
   
@@ -185,8 +178,8 @@
         <span class="input-group-text">BCV</span>
         <span class="input-group-text">Bs.</span>
         </div>
-        <input type="text" class="form-control gananciaBs" name="gananciaBs" id="gananciaBs" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['ganancia_estimadaBs']}}" required oninput="multiplicacion(this)" readonly>
+        
+        <input type="text" class="form-control gananciaBs" name="gananciaBs" id="gananciaBs" readonly>
         </div>
 
 
@@ -194,11 +187,11 @@
 
         <div class="input-group mb-3">
         <div class="input-group-prepend">
-        <span class="input-group-text">USD</span>
-        <span class="input-group-text">$</span>
+        <span class="input-group-text">BCV</span>
+        <span class="input-group-text">Bs.</span>
         </div>
         <input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)"
-        required oninput="multiplicacion(this)" readonly>
+        readonly>
         </div>
 
        
@@ -211,7 +204,7 @@
         <span class="input-group-text">Bs.</span>
         </div>
         <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
-        required oninput="multiplicacion(this)" readonly>
+         readonly>
         </div>
 
             <button type="submit" class="btn btn-outline-info">Guardar</button>
@@ -219,7 +212,6 @@
                 <a class="boton-decoracion" href="{{ url_for('listado')}}">cancelar</a>
             </button>
     </div>
-
 
     </form>
     

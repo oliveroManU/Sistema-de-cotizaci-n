@@ -27,6 +27,21 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('mostrador') }}">Productos</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('login') }}">login</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('registro') }}">registrarse</a>
+        </li>
+
+        {% if current_user.is_authenticated %}
+          <span> {{ current_user.nombre }} ({{ current_user.rol }}) </span>
+          {% if current_user.is_admin %}
+            | <a href="{{ url_for('admin_usuarios')}}">gestion de usuarios</a>
+          {% endif %}
+          | <a href="{{ url_for('logout')}}">Cerrar sesión</a>
+        {% endif %}
+        
       </ul>
       <span class="navbar-text">
         Eslogan

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Acceso al sistema - Velazcress</title>
+</head>
+<body>
+    <h2>Acceso al sistema</h2>
+    <p><em>Solo personal autorizado (operadores y administradores).</em></p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+        <p style="color: {% if category == 'si' %}green{% else %}red{% endif %};">{{ msg }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <form method="POST">
+        <label>Correo:</label>
+        <input type="email" name="email" required autofocus>
+
+        <label>Contraseña:</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Entrar</button>
+    </form>
+
+    <p style="font-size: 0.9em; color: gray;">
+        No hay registro público. Si necesitas acceso, contacta al administrador.
+    </p>
+</body>
+</html>

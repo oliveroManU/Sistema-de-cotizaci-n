@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import sqlite3
 import requests
@@ -18,6 +20,13 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 DB_PATH = os.path.join(basedir, 'Velazcress.db')
 
+### login manager, para la gestion de usuario
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'          
+login_manager.login_message = 'Debes iniciar sesión para acceder.'
+login_manager.login_message_category = 'no'
 
 @app.route('/')
 def home():
@@ -28,6 +37,253 @@ def home():
     conn.close()
     return render_template('index.html', productos=productos)    
 
+class usuario(UserMixin):
+    def __init__(self, id, nombre, email, nivel, activo=True):
+        self.id = id
+        self.nombre = nombre
+        self.email = email
+        self.nivel = nivel
+        self.activo = bool(activo)
+        
+    @property
+    def is_admin(self):
+        return self.nivel == 'admin'
+    
+    @property
+    def is_active(self):
+        return self.activo 
+        
+### Loader user para la gestion de usuario
+        
+@login_manager.user_loader
+def load_user(user_id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute(
+        'SELECT id, nombre, email, nivel, activo FROM usuarios WHERE id = ?', (user_id,)    
+    ).fetchone()
+    conn.close()
+    if row:
+        return usuario(row['id'], row['nombre'], row['email'], row['nivel'], row['activo'])
+    return None
+
+### Esto es para el login, es un poco MUY largo
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password = request.form.get('password', '')
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        row = conn.execute('SELECT * FROM usuarios WHERE email = ?', (email,)).fetchone()
+        conn.close()
+
+        if not row or not check_password_hash(row['password_hash'], password):
+            flash('Correo o contraseña incorrectos.', 'no')
+            return redirect(url_for('login'))
+
+        if not row['activo']:
+            flash('Tu cuenta está desactivada. Contacta al administrador.', 'no')
+            return redirect(url_for('login'))
+
+        user = User(row['id'], row['nombre'], row['email'], row['rol'], row['activo'])
+        login_user(user)
+
+        flash(f'Bienvenido, {user.nombre} ({user.rol}).', 'si')
+        next_page = request.args.get('next')
+        # Evitar open redirect
+        if not next_page or not next_page.startswith('/'):
+            next_page = url_for('home')
+        return redirect(next_page)
+
+    return render_template('login.html')
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada.', 'si')
+    return redirect(url_for('login'))
+
+### Finaliza lo refernete al login
+
+### administración de usuarios
+
+@app.route('/admin/usuarios')
+@admin_required
+def admin_usuarios():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    usuarios = conn.execute(
+        'SELECT id, nombre, email, rol, activo, fecha_registro FROM usuarios ORDER BY fecha_registro DESC'
+    ).fetchall()
+    conn.close()
+    return render_template('admin_usuarios.html', usuarios=usuarios)
+
+
+@app.route('/admin/usuarios/nuevo', methods=['POST'])
+@admin_required
+def admin_crear_usuario():
+    nombre   = request.form.get('nombre', '').strip()
+    email    = request.form.get('email', '').strip().lower()
+    password = request.form.get('password', '')
+    rol      = request.form.get('rol', 'operador').strip()
+
+    if rol not in ('admin', 'operador'):
+        flash('Rol inválido.', 'no')
+        return redirect(url_for('admin_usuarios'))
+
+    if not nombre or not email or len(password) < 6:
+        flash('Datos incompletos o contraseña muy corta (mín. 6).', 'no')
+        return redirect(url_for('admin_usuarios'))
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute(
+            'INSERT INTO usuarios (nombre, email, password_hash, rol, activo) VALUES (?, ?, ?, ?, 1)',
+            (nombre, email, generate_password_hash(password), rol)
+        )
+        conn.commit()
+        conn.close()
+        flash(f'Usuario {nombre} creado como {rol}.', 'si')
+    except sqlite3.IntegrityError:
+        flash('Ese correo ya existe.', 'no')
+
+    return redirect(url_for('admin_usuarios'))
+
+
+@app.route('/admin/usuarios/<int:user_id>/toggle', methods=['POST'])
+@admin_required
+def admin_toggle_usuario(user_id):
+    if user_id == current_user.id:
+        flash('No puedes desactivar tu propia cuenta.', 'no')
+        return redirect(url_for('admin_usuarios'))
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute('UPDATE usuarios SET activo = 1 - activo WHERE id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+    flash('Estado del usuario actualizado.', 'si')
+    return redirect(url_for('admin_usuarios'))
+
+
+@app.route('/admin/usuarios/<int:user_id>/reset', methods=['POST'])
+@admin_required
+def admin_reset_password(user_id):
+    nueva = request.form.get('nueva_password', '')
+    if len(nueva) < 6:
+        flash('La contraseña debe tener al menos 6 caracteres.', 'no')
+        return redirect(url_for('admin_usuarios'))
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute(
+        'UPDATE usuarios SET password_hash = ? WHERE id = ?',
+        (generate_password_hash(nueva), user_id)
+    )
+    conn.commit()
+    conn.close()
+    flash('Contraseña actualizada.', 'si')
+    return redirect(url_for('admin_usuarios'))
+
+
+@app.route('/admin/usuarios/<int:user_id>/eliminar', methods=['POST'])
+@admin_required
+def admin_eliminar_usuario(user_id):
+    if user_id == current_user.id:
+        flash('No puedes eliminar tu propia cuenta.', 'no')
+        return redirect(url_for('admin_usuarios'))
+
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute('DELETE FROM usuarios WHERE id = ?', (user_id,))
+    conn.commit()
+    conn.close()
+    flash('Usuario eliminado.', 'si')
+    return redirect(url_for('admin_usuarios'))
+
+### Ruta del login para 
+"""
+@app.route('/login', methods=['GET','POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('mostrador'))
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        password =request.form.get('password', '')
+    
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        row = conn.execute(
+            'SELECT * FROM usuarios WHERE email = ?', (email,)    
+        ).fetchone()
+        conn.close
+    
+        if row and check_password_hash(row['password_hash'], password):
+            user = usuario(row['id'], row['nombre'], row['email'], row['nivel'])
+            login_user(user)
+            flash(f'Bienvenido, {usuario.nombre}', 'si')
+            next_page = request.args.get('next')
+            return redirect(next_page or url_for('mostrador'))
+    
+        flash('Correo o contraseña incorrectos', 'no')
+    
+    return render_template('login.html')
+
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    if current_user.is_authenticated:
+        return redirect(url_for('mostrar'))
+    
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip().lower
+        password = request.form.get('password', '')
+        password2 = request.form.get('password2', '')
+        
+        if not nombre or not email or not password:
+            flash('Todos los campos son obligatorios', 'no')
+            return redirect(url_for('registro'))
+        
+        if password != password2:
+            flash('las contraseñas no coinciden', 'no')
+            return redirect(url_for('registro'))    
+        
+        if len(password) < 6:
+            flash('minimo 6 caracteres', 'no')
+            return redirect(url_for('registro'))    
+        
+        password_hash = generate_password_hash(password)
+        
+        try:
+            conn = sqlite3.connect(DB_PATH)
+            conn.execute(
+                'INSERT INTO usuarios (nombre, email, password_hash, nivel) VALUES (?, ?, ?, ?)',
+                (nombre, email, password_hash, 'cl') 
+            )
+            conn.commit()
+            conn.close()
+            flash('Registro exitoso. Ahora puedes iniciar sesión.', 'si')
+            return redirect(url_for('login'))
+        except sqlite3.IntegrityError:
+            flash('Ese correo ya está registrado', 'no')
+            return redirect(url_for('registro'))
+
+    return render_template('registro.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada correctamente', 'si')
+    return redirect(url_for('login'))
+"""
+
 @app.route('/mostrador')
 def mostrador():
     conn = sqlite3.connect(DB_PATH)
@@ -37,6 +293,11 @@ def mostrador():
     productos = cursor.fetchall()
     conn.close()
     return render_template('mostrador.html', productos=productos)    
+
+
+    
+
+    
 
 @app.route('/producto/<int:producto_id>')
 def editar_producto(producto_id):
@@ -188,7 +449,6 @@ def actualizar_productos1(productos_id):
         return redirect(url_for('actualizar_productos1', productos_id=productos_id, ))
 
 
-
 @app.route('/eliminar/<int:productos_id>', methods=["POST"])
 def eliminar_producto1(productos_id):
     conn = sqlite3.connect(DB_PATH)
@@ -199,11 +459,31 @@ def eliminar_producto1(productos_id):
     flash('Producto eliminado')
     return redirect(url_for('listado'))
     
-    
-    
-    
+### registro de clientes a la base de datos
 
+"""
 
+@app.route('/registroclientes', methods=['GET','POST'])
+def registro_clientes():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    if request.method == 'POST':
+        
+        nombre = request.form.get('nombre')
+        rif = request.form.get('RIF')
+        direccion = request.form.get('direccion')
+        email = request.form.get('email')
+        telefono = request.form.get('telefono')
+        
+        
+        conn.execute('INSERT INTO productos (nombre, rif, , cantidad,) VALUES (?, ?, ?, ?, ?)', 
+                   (nombre, rif, direccion, email, telefono))
+        conn.commit()
+    clientes = conn.execute("SELECT * FROM productos").fetchall()  
+    conn.close()  
+    return render_template('registroclientes.html')
+"""
+    
 def obtener_tasa_bcv(moneda="euro"):
     """
     Obtiene la tasa oficial del BCV.

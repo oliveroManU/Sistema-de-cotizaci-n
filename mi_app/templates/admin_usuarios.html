@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de usuarios</title>
+</head>
+<body>
+    <h2>Gestión de usuarios</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, msg in messages %}
+        <p style="color: {% if category == 'si' %}green{% else %}red{% endif %};">{{ msg }}</p>
+      {% endfor %}
+    {% endwith %}
+
+    <p>Logueado como <strong>{{ current_user.nombre }}</strong>
+       ({{ current_user.rol }}) · <a href="{{ url_for('logout') }}">Salir</a></p>
+
+    <hr>
+
+    <h3>Crear nuevo usuario</h3>
+    <form method="POST" action="{{ url_for('admin_crear_usuario') }}">
+        <input type="text"     name="nombre"   placeholder="Nombre completo" required>
+        <input type="email"    name="email"    placeholder="Correo" required>
+        <input type="password" name="password" placeholder="Contraseña (mín. 6)" required minlength="6">
+        <select name="rol">
+            <option value="operador">Operador</option>
+            <option value="admin">Administrador</option>
+        </select>
+        <button type="submit">Crear</button>
+    </form>
+
+    <hr>
+
+    <h3>Usuarios existentes</h3>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th>Nombre</th><th>Email</th><th>nivel</th><th>Estado</th><th>Acciones</th>
+        </tr>
+        {% for u in usuarios %}
+        <tr>
+            <td>{{ u.nombre }}</td>
+            <td>{{ u.email }}</td>
+            <td>{{ u.nivel }}</td>
+            <td>{% if u.activo %}Activo{% else %}Inactivo{% endif %}</td>
+            <td>
+                {% if u.id != current_user.id %}
+                    <form method="POST" action="{{ url_for('admin_toggle_usuario', user_id=u.id) }}" style="display:inline">
+                        <button type="submit">{% if u.activo %}Desactivar{% else %}Activar{% endif %}</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin_reset_password', user_id=u.id) }}" style="display:inline">
+                        <input type="password" name="nueva_password" placeholder="Nueva clave" minlength="6">
+                        <button type="submit">Resetear</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin_eliminar_usuario', user_id=u.id) }}" style="display:inline"
+                          onsubmit="return confirm('¿Eliminar usuario?');">
+                        <button type="submit">Eliminar</button>
+                    </form>
+                {% else %}
+                    <em>(tú)</em>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

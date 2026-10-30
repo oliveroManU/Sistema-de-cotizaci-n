@@ -1,8 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import pdfkit
 import os
 import sqlite3
 import requests
@@ -404,16 +405,18 @@ def cotizacion_int():
     conn.close()  
     return render_template('insersion.html', tasa_bcv_dolar=tasa_bcv_dolar, tasa_bcv_euro=tasa_bcv_euro, productos=productos)
 
-@app.route('/listado')
+### Tabla para consultar los registros de cotizaciones 
+
+@app.route('/registros_cotizaciones')
 @login_required
-def listado():
+def registros_cotizaciones():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor = conn.execute('SELECT * FROM productos')
-    productos = cursor.fetchall()
+    cursor = conn.execute('SELECT * FROM reg_cotizaciones ORDER BY id DESC')
+    registroscot = cursor.fetchall()
     conn.close()
-    return render_template('listado.html', productos=productos) 
+    return render_template('registros_cotizaciones.html', registroscot=registroscot) 
 
 @app.route('/productos/<int:productos_id>')
 @login_required
@@ -434,36 +437,56 @@ def editar_productos1(productos_id):
 @app.route('/productos/<int:productos_id>', methods=['POST'])
 @login_required
 def actualizar_productos1(productos_id):
-    
     try:
         
-        nombre = request.form.get('nombre', '').strip()    
-        marca = request.form.get('marca', '').strip()
-        moneda =  request.form.get('moneda', '').strip()
+        nombre_producto = request.form.get('nombre_producto')
+        marca_producto = request.form.get('marca_producto')
         precio = float(request.form.get('precio-producto', 0))
         cantidad = int(request.form.get('cantidad-producto', 0))
         preciounidad = float(request.form.get('precioporunidad', 0))
         tasapago = float(request.form.get('tasapago', 0))  
         preciod = float(request.form.get('preciod', 0))
         precioventa = float(request.form.get('precio-venta', 0))
-        gananciaD = float(request.form.get('gananciaD', 0))
-        gananciaBs =  float(request.form.get('gananciaBs', 0))
-        
+        gananciaD = float(request.form.get('ValorActualD', 0))
+        gananciaBs = float(request.form.get('gananciaBs', 0))
+        gananciasobrecosto = float(request.form.get('gananciasobrecosto', 0))
+        margen_ganancia = float(request.form.get('margen-ganancia', 0))
+        monto_iva = float(request.form.get('monto-iva', 0))
+        precio_con_iva = float(request.form.get('precio-con-iva', 0))
+        monto_iva_d = float(request.form.get('monto-iva-d', 0))
+        tasa_hoy = float(request.form.get('tasapagohoy', 0))
+        porcentaje = float(request.form.get('porcentajecompraventa', 0))
+
         with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
+            
             cursor.execute(
                 'UPDATE productos SET precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? WHERE id = ? ',
                 (precio, cantidad, preciounidad, tasapago, preciod, precioventa, gananciaD, gananciaBs, productos_id)
-            )           
+            )
+            
+            # --- 4. Guardamos el registro en reg_cotizaciones ---
+            cursor.execute('''
+                INSERT INTO reg_cotizaciones (
+                    producto_id, nombre_producto, marca_producto, precio_unitario, cantidad, precio_total, tasa_bcv, 
+                    porcentaje_ganancia, precio_venta, ganancia_bs, ganancia_usd, 
+                    ganancia_sobre_costo, margen_ganancia, monto_iva, precio_con_iva, monto_iva_usd
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                productos_id, nombre_producto, marca_producto, preciounidad, cantidad, precio, tasa_hoy, 
+                porcentaje, precioventa, gananciaBs, gananciaD, 
+                gananciasobrecosto, margen_ganancia, monto_iva, precio_con_iva, monto_iva_d
+            ))
+            
             conn.commit()
     
-        flash('Producto Actualizado correctamnet', 'si')
-        return redirect(url_for('listado'))   
+        flash('Producto y cotización guardados correctamente', 'si')
+        return redirect(url_for('mostrador'))   
         
-        
-    except (ValueError,TypeError) as e:
-        flash(f'error en los datos: {e}', 'no')
-        return redirect(url_for('actualizar_productos1', productos_id=productos_id, ))
+    except (ValueError, TypeError) as e:
+        flash(f'Error en los datos: {e}', 'no')
+        # Redirigimos a la ruta GET para evitar el error 405 Method Not Allowed
+        return redirect(url_for('editar_productos1', productos_id=productos_id))
 
 
 @app.route('/eliminar/<int:productos_id>', methods=["POST"])
@@ -475,7 +498,7 @@ def eliminar_producto1(productos_id):
     conn.close()
     
     flash('Producto eliminado')
-    return redirect(url_for('listado'))
+    return redirect(url_for('registros_cotizaciones'))
     
 ### registro de clientes a la base de datos
 
@@ -501,6 +524,43 @@ def registro_clientes():
     conn.close()  
     return render_template('registroclientes.html')
 """
+    
+@app.route('/descargar_pdf/<int:id>')
+@login_required
+def descargar_pdf(id):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    # Buscamos la cotización específica por su ID
+    rc = conn.execute('SELECT * FROM reg_cotizaciones WHERE id = ?', (id,)).fetchone()
+    conn.close()
+
+    if not rc:
+        flash('Cotización no encontrada.', 'no')
+        return redirect(url_for('registros_cotizaciones'))
+
+    # Renderizamos una plantilla HTML exclusiva para el PDF
+    html = render_template('pdf_cotizacion.html', rc=rc)
+    
+    # Configuración de pdfkit (ajusta la ruta si es necesario)
+    options = {
+        'page-size': 'A4',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'no-outline': None
+    }
+    
+    # Generamos el PDF en memoria y lo enviamos al navegador
+    pdf = pdfkit.from_string(html, False, options=options)
+    
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    # inline = se abre en el navegador; attachment = se descarga directo
+    response.headers['Content-Disposition'] = f'inline; filename=cotizacion_{id}.pdf'
+    
+    return response
     
 def obtener_tasa_bcv(moneda="euro"):
     """

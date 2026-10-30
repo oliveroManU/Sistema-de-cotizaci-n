@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; color: #333; font-size: 12px; }
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .header h1 { margin: 0; color: #1a1a1a; }
+        .info-cliente { margin-bottom: 20px; }
+        .info-cliente p { margin: 5px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; font-weight: bold; }
+        .total-row { font-weight: bold; background-color: #e9e9e9; }
+        .footer { margin-top: 40px; text-align: center; font-size: 10px; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Velazcress - Cotización</h1>
+        <p>Fecha de emisión: {{ rc.fecha }}</p>
+    </div>
+
+    <div class="info-cliente">
+        <p><strong>Lote / ID Producto:</strong> #{{ rc.lote_id }} (ID: {{ rc.producto_id }})</p>
+        <p><strong>Producto:</strong> {{ rc.nombre_producto }}</p>
+        <p><strong>Marca:</strong> {{ rc.marca_producto }}</p>
+        <p><strong>Tasa BCV aplicada:</strong> Bs. {{ rc.tasa_bcv }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total Base (PB)</th>
+                <th>% Ganancia</th>
+                <th>Precio de Venta</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ rc.cantidad }}</td>
+                <td>Bs. {{ rc.precio_unitario }}</td>
+                <td>Bs. {{ rc.precio_total }}</td>
+                <td>{{ rc.porcentaje_ganancia }}%</td>
+                <td>Bs. {{ rc.precio_venta }}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3"></td>
+                <td>IVA (Bs):</td>
+                <td>Bs. {{ rc.monto_iva }}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3"></td>
+                <td>IVA (USD):</td>
+                <td>$ {{ rc.monto_iva_usd }}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3"></td>
+                <td>Total con IVA:</td>
+                <td>Bs. {{ rc.precio_con_iva }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Este documento es una cotización generada por el sistema Velazcress.</p>
+    </div>
+</body>
+</html>

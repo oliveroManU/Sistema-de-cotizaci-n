@@ -20,7 +20,7 @@
     <div class="collapse navbar-collapse" id="navbarText">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="{{ url_for('listado') }}">Home</a>
+          <a class="nav-link active" aria-current="page" href="{{ url_for('registros_cotizaciones') }}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('cotizacion_int') }}">Registro</a>
@@ -39,23 +39,24 @@
 
 <div  class="contenedor-formularios">
     <div class="form-group rounded-top rounded-top">
-    
-
+           
        <h6 class="h6-lote-EditList" >Lote #{{productos['id']}}</h4>
        <h1 class="h1-producto-EditList">{{productos['nombre']}}</h2>
-       <h3 class="h3-marca-EditList">{{productos['marca']}}</h3>
-       
+       <h3 class="h3-marca-EditList ">{{productos['marca']}}</h3>
     
        <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">      
 
-        <label for="">Precio:</label><br>
+        <input type="hidden" name="nombre_producto" value="{{productos['nombre']}}">
+        <input type="hidden" name="marca_producto" value="{{productos['marca']}}">
+
+        <label for="">Valor unitario de producto:</label><br>
         <div class="input-group mb-3">
         <div class="input-group-prepend">
-        <span class="input-group-text">BCV</span>
+        <span class="input-group-text">BCV.</span>
         <span class="input-group-text">Bs.</span>
         </div>
-        <input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
-        value="{{productos['precio']}}" required oninput="multiplicacion(this)" > <br><br>
+        <input type="text" class="form-control precioporunidad" name="precioporunidad" id="precioporunidad" aria-label="Amount (to the nearest dollar)"
+        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)">
         </div>
 
         <label for="">cantidad:</label><br>
@@ -66,18 +67,18 @@
         </div>
         <input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
         value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> <br><br>
-        </div>
-
-        <label for="">Precio por unidad:</label><br>
+        </div>        
+        
+        <label for="">Precio:</label><br>
         <div class="input-group mb-3">
         <div class="input-group-prepend">
-        <span class="input-group-text">BCV.</span>
+        <span class="input-group-text">BCV</span>
         <span class="input-group-text">Bs.</span>
         </div>
-        <input type="text" class="form-control precioporunidad" name="precioporunidad" id="precioporunidad" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)" readonly>
+        <input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+        value="{{productos['precio']}}" required oninput="multiplicacion(this)" > <br><br>
         </div>
-        
+
         <label for="">tasapago:</label><br>
         <div class="input-group mb-3">
         <div class="input-group-prepend">
@@ -247,7 +248,7 @@
 
             <button type="submit" class="btn btn-outline-info">Guardar</button>
             <button class="btn btn-outline-danger boton-decoracion text-decoration-none" >
-                <a class="boton-decoracion" href="{{ url_for('listado')}}">cancelar</a>
+                <a class="boton-decoracion" href="{{ url_for('registros_cotizaciones')}}">cancelar</a>
             </button>
     </div>
 

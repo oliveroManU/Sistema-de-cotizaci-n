@@ -1,14 +1,14 @@
 function multiplicacion(elemento) {
     const fila = elemento.closest('form');
     
-    const PrecioProducto = parseFloat(fila.querySelector('.precio-producto').value) || 0;
+    const ValorPorUnidad = parseFloat(fila.querySelector('.precioporunidad').value) || 0;
     const CantidadProducto = parseFloat(fila.querySelector('.cantidad-producto').value) || 0;
     // const TasaPagoProducto = parseFloat(fila.querySelector('.tasapago').value) || 0;
     const TasaPagoProductoHoy = parseFloat(fila.querySelector('.tasapagohoy').value) || 0;
     const PorcentajeDeGanancia = parseFloat(fila.querySelector('.porcentajeCV').value) || 0;
 
-    const ValorPorUnidad = CantidadProducto !== 0 ? PrecioProducto / CantidadProducto : 0;
-    fila.querySelector('.precioporunidad').value = ValorPorUnidad.toFixed(2);
+    const PrecioProducto = CantidadProducto !== 0 ? ValorPorUnidad * CantidadProducto : 0;
+    fila.querySelector('.precio-producto').value = PrecioProducto.toFixed(2);
 
      if (elemento.classList.contains('porcentajeCV')) {
         const nuevoPrecioVenta = PrecioProducto * (1 + PorcentajeDeGanancia / 100);

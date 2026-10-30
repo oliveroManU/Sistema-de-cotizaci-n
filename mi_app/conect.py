@@ -6,6 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import os
 import sqlite3
 import requests
+from functools import wraps
 from datetime import date
 from bs4 import BeautifulSoup
 import urllib3
@@ -67,6 +68,19 @@ def load_user(user_id):
         return usuario(row['id'], row['nombre'], row['email'], row['nivel'], row['activo'])
     return None
 
+### Sin esto no sirve el admin_required,(no se porque pero es necesario)
+### es para que solo los administradores puedan acceder a ciertas rutas
+
+def admin_required(f):
+    @wraps(f)
+    @login_required
+    def wrapper(*args, **kwargs):
+        if not current_user.is_admin:
+            flash('Solo administradores pueden acceder aquí.', 'no')
+            return redirect(url_for('home'))
+        return f(*args, **kwargs)
+    return wrapper
+
 ### Esto es para el login, es un poco MUY largo
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -91,10 +105,10 @@ def login():
             flash('Tu cuenta está desactivada. Contacta al administrador.', 'no')
             return redirect(url_for('login'))
 
-        user = User(row['id'], row['nombre'], row['email'], row['rol'], row['activo'])
+        user = usuario(row['id'], row['nombre'], row['email'], row['nivel'], row['activo'])
         login_user(user)
 
-        flash(f'Bienvenido, {user.nombre} ({user.rol}).', 'si')
+        flash(f'Bienvenido, {user.nombre} ({user.nivel}).', 'si')
         next_page = request.args.get('next')
         # Evitar open redirect
         if not next_page or not next_page.startswith('/'):
@@ -121,7 +135,7 @@ def admin_usuarios():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     usuarios = conn.execute(
-        'SELECT id, nombre, email, rol, activo, fecha_registro FROM usuarios ORDER BY fecha_registro DESC'
+        'SELECT id, nombre, email, nivel, activo FROM usuarios ORDER BY id DESC'
     ).fetchall()
     conn.close()
     return render_template('admin_usuarios.html', usuarios=usuarios)
@@ -133,10 +147,10 @@ def admin_crear_usuario():
     nombre   = request.form.get('nombre', '').strip()
     email    = request.form.get('email', '').strip().lower()
     password = request.form.get('password', '')
-    rol      = request.form.get('rol', 'operador').strip()
+    nivel    = request.form.get('nivel', 'operador').strip()
 
-    if rol not in ('admin', 'operador'):
-        flash('Rol inválido.', 'no')
+    if nivel not in ('admin', 'operador'):
+        flash('Nivel inválido.', 'no')
         return redirect(url_for('admin_usuarios'))
 
     if not nombre or not email or len(password) < 6:
@@ -146,12 +160,12 @@ def admin_crear_usuario():
     try:
         conn = sqlite3.connect(DB_PATH)
         conn.execute(
-            'INSERT INTO usuarios (nombre, email, password_hash, rol, activo) VALUES (?, ?, ?, ?, 1)',
-            (nombre, email, generate_password_hash(password), rol)
+            'INSERT INTO usuarios (nombre, email, password_hash, nivel, activo) VALUES (?, ?, ?, ?, 1)',
+            (nombre, email, generate_password_hash(password), nivel)
         )
         conn.commit()
         conn.close()
-        flash(f'Usuario {nombre} creado como {rol}.', 'si')
+        flash(f'Usuario {nombre} creado como {nivel}.', 'si')
     except sqlite3.IntegrityError:
         flash('Ese correo ya existe.', 'no')
 
@@ -285,6 +299,7 @@ def logout():
 """
 
 @app.route('/mostrador')
+@login_required
 def mostrador():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -292,14 +307,10 @@ def mostrador():
     cursor = conn.execute('SELECT * FROM productos')
     productos = cursor.fetchall()
     conn.close()
-    return render_template('mostrador.html', productos=productos)    
-
-
-    
-
-    
+    return render_template('mostrador.html', productos=productos)       
 
 @app.route('/producto/<int:producto_id>')
+@login_required
 def editar_producto(producto_id):
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
@@ -313,6 +324,7 @@ def editar_producto(producto_id):
 
 
 @app.route('/producto/<int:producto_id>', methods=['POST'])
+@login_required
 def actualizar_producto(producto_id):
     nombre = request.form.get('nombre')
     marca = request.form.get('marca')
@@ -333,6 +345,7 @@ def actualizar_producto(producto_id):
     return redirect(url_for('mostrador'))
 
 @app.route('/producto/<int:producto_id>/imagen', methods=['POST'])
+@login_required
 def subir_imagen(producto_id):
     archivo = request.files.get('imagen')
 
@@ -363,6 +376,7 @@ def subir_imagen(producto_id):
 
 
 @app.route('/cotizacion_int', methods=['GET','POST'])
+@login_required
 def cotizacion_int():
     tasa_bcv_dolar = obtener_tasa_bcv("dolar")
     tasa_bcv_euro = obtener_tasa_bcv("euro")
@@ -391,6 +405,7 @@ def cotizacion_int():
     return render_template('insersion.html', tasa_bcv_dolar=tasa_bcv_dolar, tasa_bcv_euro=tasa_bcv_euro, productos=productos)
 
 @app.route('/listado')
+@login_required
 def listado():
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -401,6 +416,7 @@ def listado():
     return render_template('listado.html', productos=productos) 
 
 @app.route('/productos/<int:productos_id>')
+@login_required
 def editar_productos1(productos_id):
     with sqlite3.connect(DB_PATH) as conn:
         conn.row_factory = sqlite3.Row
@@ -416,6 +432,7 @@ def editar_productos1(productos_id):
 
 
 @app.route('/productos/<int:productos_id>', methods=['POST'])
+@login_required
 def actualizar_productos1(productos_id):
     
     try:
@@ -450,6 +467,7 @@ def actualizar_productos1(productos_id):
 
 
 @app.route('/eliminar/<int:productos_id>', methods=["POST"])
+@login_required
 def eliminar_producto1(productos_id):
     conn = sqlite3.connect(DB_PATH)
     conn.execute("DELETE FROM productos WHERE id = ?", (productos_id,))    

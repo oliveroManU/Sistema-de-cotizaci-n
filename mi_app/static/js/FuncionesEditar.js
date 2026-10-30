@@ -14,10 +14,6 @@ function multiplicacion(elemento) {
         const nuevoPrecioVenta = PrecioProducto * (1 + PorcentajeDeGanancia / 100);
         fila.querySelector('.precio-venta').value = nuevoPrecioVenta.toFixed(2);
 
-        
-
-        
-
     }
 
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
@@ -37,7 +33,24 @@ function multiplicacion(elemento) {
     const MargendeGanancia = PrecioVenta !== 0 ? ((PrecioVenta - PrecioProducto) / PrecioVenta) * 100: 0;
     fila.querySelector('.margen-ganancia').value = MargendeGanancia.toFixed(4);
 
-        
+    const PorcentajeIVA = 16;
+
+    const MontoIVA = PrecioVenta * (PorcentajeIVA / 100);
+    const PrecioConIVA = PrecioVenta + MontoIVA;
+
+    // Aquí asignas el valor a tus inputs (asegúrate de que estos nombres coincidan con tu HTML)
+    if (fila.querySelector('.monto-iva')) {
+        fila.querySelector('.monto-iva').value = MontoIVA.toFixed(2);
+    }
+    if (fila.querySelector('.precio-con-iva')) {
+        fila.querySelector('.precio-con-iva').value = PrecioConIVA.toFixed(2);
+    }
+
+    // precio total con IVA incluido en dólares:
+    const MontoIVADolares = TasaPagoProductoHoy !== 0 ? (MontoIVA / TasaPagoProductoHoy) : 0;
+    if (fila.querySelector('.monto-iva-d')) {
+        fila.querySelector('.monto-iva-d').value = MontoIVADolares.toFixed(2);
+    }   
 
     /// const PrecioDolares = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProducto) : 0;
     /// const total = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProducto)) : 0;

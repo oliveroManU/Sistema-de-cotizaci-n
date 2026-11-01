@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Productos | Velazcres{% endblock %}
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Catálogo</span>
+        <h1>Productos</h1>
+        <p>Explora los productos y abre una ficha para actualizar sus datos.</p>
+    </div>
+</section>
+
+<section class="app-product-grid" aria-label="Catálogo de productos">
+    {% for producto in productos %}
+    <article class="app-product-card">
+        <a href="{{ url_for('editar_producto', producto_id=producto['id']) }}" aria-label="Ver {{ producto.nombre }}">
+            <img class="producto-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" alt="{{ producto.nombre }}">
+        </a>
+        <div class="card-body">
+            <h2>{{ producto.nombre }}</h2>
+            <p class="product-brand">{{ producto.marca }}</p>
+            <span class="app-product-price">Precio: {{ producto.moneda }} {{ producto.precio }}</span>
+            <span class="app-product-stock">Existencia: {{ producto.cantidad }}</span>
+        </div>
+        <div class="app-product-actions">
+            <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('editar_producto', producto_id=producto['id']) }}">Editar</a>
+            <a class="btn btn-warning btn-sm" href="{{ url_for('editar_productos1', productos_id=producto['id']) }}">Cotización</a>
+            <form action="{{ url_for('eliminar_producto1', productos_id=producto.id) }}" method="post" onsubmit="return confirm('¿Confirmar?');">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Eliminar</button>
+            </form>
+        </div>
+    </article>
+    {% else %}
+    <div class="app-empty-state">No hay productos para mostrar.</div>
+    {% endfor %}
+</section>
+{% endblock %}

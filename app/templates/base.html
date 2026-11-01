@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#171717">
+    <title>{% block title %}Velazcres | Gestión comercial{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/brand.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="app-body">
+    <a class="app-skip-link" href="{{ url_for('home') }}">Saltar al contenido</a>
+    <header class="app-header">
+        <nav class="navbar navbar-expand-lg app-navbar" aria-label="Navegación principal">
+            <div class="container-fluid app-nav-container">
+                <a class="navbar-brand app-brand" href="{{ url_for('mostrador') }}">
+                    <img src="{{ url_for('static', filename='img/velazcres-logo.png') }}" alt="" class="app-brand-logo">
+                    <span class="app-brand-copy">
+                        <span class="app-brand-name">Velazcres</span>
+                        <span class="app-brand-caption">Gestión comercial</span>
+                    </span>
+                </a>
+                <button class="navbar-toggler app-nav-toggle" type="button" data-bs-toggle="collapse" data-bs-target="#appNavigation" aria-controls="appNavigation" aria-expanded="false" aria-label="Abrir navegación">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse app-navigation" id="appNavigation">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.endpoint == 'home' or request.endpoint == '' or request.endpoint == 'actualizar_productos1' %} active{% endif %}" {% if request.endpoint == 'home' or request.endpoint == 'editar_productos1' or request.endpoint == 'actualizar_productos1' %}aria-current="page"{% endif %} href="{{ url_for('home') }}">Principal</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.endpoint == 'cotizacion_int' %} active{% endif %}" {% if request.endpoint == 'cotizacion_int' %}aria-current="page"{% endif %} href="{{ url_for('cotizacion_int') }}">Registrar producto</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.endpoint == 'mostrador' or request.endpoint == 'editar_producto' or request.endpoint == 'actualizar_producto' %} active{% endif %}" {% if request.endpoint == 'mostrador' or request.endpoint == 'editar_producto' or request.endpoint == 'actualizar_producto' %}aria-current="page"{% endif %} href="{{ url_for('mostrador') }}">Productos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.endpoint == 'registros_cotizaciones' or request.endpoint == 'editar_producto' or request.endpoint == 'actualizar_producto' %} active{% endif %}" {% if request.endpoint == 'mostrador' or request.endpoint == 'editar_producto' or request.endpoint == 'actualizar_producto' %}aria-current="page"{% endif %} href="{{ url_for('registros_cotizaciones') }}">Registros</a>
+                        </li>
+                    </ul>
+                    <span class="app-nav-tagline">Lubricantes y soluciones automotrices</span>
+
+                    <div class="menu-derecha">
+                        {% if current_user.is_authenticated %}
+                            <span class="app-user-badge">{{ current_user.nombre }} ({{ current_user.nivel }})</span>
+                            {% if current_user.is_admin %}
+                                <a class="nav-link" href="{{ url_for('admin_usuarios') }}">Gestión de usuarios</a>
+                            {% endif %}
+                            <a class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                        {% else %}
+                            <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="app-main" id="main-content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="app-flash-stack" aria-live="polite">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'no' else 'success' if category == 'si' else 'warning' if category == 'message' else category }} app-alert" role="status">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

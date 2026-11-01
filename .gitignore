@@ -1,0 +1,15 @@
+.venv/
+venv/
+**/.venv/
+**/venv/
+__pycache__/
+*.py[cod]
+
+*.sqlite
+*.sqlite3
+*.sqbpro
+*.zip
+
+.env
+.env.*
+!.env.example

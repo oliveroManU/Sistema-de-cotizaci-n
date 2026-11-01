@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Editar producto | Velazcres{% endblock %}
+{% block head %}
+    <script src="{{ url_for('static', filename='js/Funciones.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Catálogo</span>
+        <h1>Editar producto</h1>
+        <p>Actualiza la información general y la imagen del producto.</p>
+    </div>
+</section>
+
+<section class="contenedor-formularios">
+    <div class="form-group">
+        <div class="app-card-heading">
+            <h2>{{ producto['nombre'] }}</h2>
+            <p>Información del producto</p>
+        </div>
+        <form method="POST" action="{{ url_for('actualizar_producto', producto_id=producto['id']) }}">
+            <div class="app-form-grid">
+                <div class="app-form-field app-form-field--full">
+                    <label class="form-label" for="nombre">Nombre</label>
+                    <input type="text" class="form-control" name="nombre" id="nombre" value="{{ producto['nombre'] }}" required>
+                </div>
+                <div class="app-form-field">
+                    <label class="form-label" for="marca">Marca</label>
+                    <input type="text" class="form-control" name="marca" id="marca" value="{{ producto['marca'] }}">
+                </div>
+                <div class="app-form-field">
+                    <label class="form-label" for="precio">Precio</label>
+                    <input type="text" class="form-control" name="precio" id="precio" step="0.01" value="{{ producto['precio'] }}" required>
+                </div>
+                <div class="app-form-field">
+                    <label class="form-label" for="cantidad">Cantidad</label>
+                    <input type="number" class="form-control" name="cantidad" id="cantidad" value="{{ producto['cantidad'] }}">
+                </div>
+            </div>
+            <div class="app-form-actions">
+                <button class="btn btn-primary" type="submit">Guardar cambios</button>
+                <a class="btn btn-outline-secondary" href="{{ url_for('mostrador') }}">Cancelar</a>
+            </div>
+        </form>
+    </div>
+
+    <aside class="card app-image-card">
+        <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + producto['id']|string + '.jpg') }}" alt="Imagen de {{ producto['nombre'] }}">
+        <div class="card-body">
+            <h2 class="card-title">Imagen del producto</h2>
+            <p class="card-text">Selecciona una imagen nueva para actualizar la ficha.</p>
+            <form method="POST" action="{{ url_for('subir_imagen', producto_id=producto['id']) }}" enctype="multipart/form-data">
+                <input type="file" name="imagen" id="imagen" accept="image/*" required>
+                <button type="submit" class="btn btn-primary buttons-card-editar">Actualizar imagen</button>
+            </form>
+        </div>
+    </aside>
+</section>
+{% endblock %}

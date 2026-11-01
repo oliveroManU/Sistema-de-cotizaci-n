@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Registros de Cotizaciones | Velazcres{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h1-listado text-center mb-4">Registros de Cotizaciones</h1>
+
+    <div class="table-responsive">
+        <table class="table table-striped" style="width: 90%; margin-left: auto; margin-right: auto; font-size: 14px;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Fecha</th>
+                    <th>ID_Producto</th>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Precio Unitario</th>
+                    <th>Cantidad</th>
+                    <th>Precio Total (PB)</th>
+                    <th>Tasa BCV</th>
+                    <th>% Ganancia</th>
+                    <th>Precio venta</th>
+                    <th>Ganancia Bs</th>
+                    <th>Ganancia USD</th>
+                    <th>Ganancia s/ costo</th>
+                    <th>Margen ganancia</th>
+                    <th>Total con IVA</th>
+                    <th>Imprimir</th>
+                </tr>
+            </thead>
+            <tbody style="font-size: 12px;">
+                {% for rc in registroscot %}
+                <tr>
+                    <th>{{ rc.id }}</th>
+                    <td>{{ rc.fecha }}</td>
+                    <td>{{ rc.producto_id }}</td>
+                    <td>{{ rc.nombre_producto }}</td>
+                    <td>{{ rc.marca_producto }}</td>
+                    <td><span>Bs. </span>{{ rc.precio_unitario }}</td>
+                    <td>{{ rc.cantidad }}</td>
+                    <td><span>Bs. </span>{{ rc.precio_total }}</td>
+                    <td><span>BCV. </span>{{ rc.tasa_bcv }}</td>
+                    <td><span>% </span>{{ rc.porcentaje_ganancia }}</td>
+                    <td><span>Bs. </span>{{ rc.precio_venta }}</td>
+                    <td><span>Bs. </span>{{ rc.ganancia_bs }}</td>
+                    <td><span>USD. $ </span>{{ rc.ganancia_usd }}</td>
+                    <td><span>Bs. </span>{{ rc.ganancia_sobre_costo }}</td>
+                    <td><span>% </span>{{ rc.margen_ganancia }}</td>
+                    <td>
+                        <div><span>Bs. </span>{{ rc.monto_iva }}</div>
+                        <div><span>USD. $ </span>{{ rc.monto_iva_usd }}</div>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('descargar_pdf', id=rc.id) }}" target="_blank" class="btn btn-primary btn-sm">Imprimir PDF</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="17" style="text-align: center;">No hay cotizaciones registradas</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

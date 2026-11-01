@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Cotización | Velazcres{% endblock %}
+{% block head %}
+    <script src="{{ url_for('static', filename='js/Funciones.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Área comercial</span>
+        <h1>Cotización</h1>
+        <p>Prepara una cotización con los datos del cliente y los productos solicitados.</p>
+    </div>
+</section>
+
+<section class="app-grid app-quote-details" aria-label="Datos de la cotización">
+    <div class="app-card">
+        <div class="app-card-heading">
+    <h2>Información del cliente</h2>
+    <p>Datos de contacto y facturación</p>
+</div>
+<form action="{{ url_for('guardar_cliente') }}" method="POST">
+    <div class="app-form-grid">
+        <div class="app-form-field app-form-field--full">
+            <label class="form-label" for="nombre-cliente">Nombre del cliente</label>
+            <input id="nombre-cliente" name="NAME_CLIENT" class="form-control" placeholder="Nombre y apellido" type="text" required>
+        </div>
+        <div class="app-form-field app-form-field--full">
+            <label class="form-label" for="direccion-cliente">Dirección</label>
+            <input id="direccion-cliente" name="DELIVERY_LOCATION" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+        </div>
+        <div class="app-form-field app-form-field--full">
+            <button class="btn btn-primary" type="submit">Guardar cliente</button>
+        </div>
+    </div>
+</form>
+
+    <div class="app-card">
+        <div class="app-card-heading">
+            <h2>Datos de cotización</h2>
+            <p>Moneda y condiciones de pago</p>
+        </div>
+        <div class="app-form-field mb-3">
+            <label class="form-label" for="id-cotizacion">Número de cotización</label>
+            <input id="id-cotizacion" class="form-control" type="text" placeholder="000001">
+        </div>
+        <div class="app-form-field mb-3">
+            <label class="form-label" for="tipo-moneda">Moneda</label>
+            <select class="form-select" name="tipo-moneda" id="tipo-moneda">
+                <option value="bs">Bolívares (Bs.)</option>
+                <option value="dola">Dólares ($)</option>
+                <option value="euro">Euros (€)</option>
+            </select>
+        </div>
+        <div class="app-form-field">
+            <label class="form-label" for="Forma">Forma de pago</label>
+            <select class="form-select" name="forma-pago" id="Forma">
+                <option value="bs">Transferencia bancaria</option>
+                <option value="dola">Efectivo</option>
+                <option value="">Pago móvil</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<section class="app-card mt-4">
+    <div class="app-card-heading">
+        <h2>Productos de la cotización</h2>
+        <p>Agrega los productos requeridos y revisa sus importes.</p>
+    </div>
+    <div class="table-responsive">
+        <table class="table align-middle" id="tabla-productos">
+            <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Subtotal</th>
+                    <th scope="col">Descuento</th>
+                    <th scope="col">Total</th>
+                    <th scope="col">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo-tabla">
+                <tr>
+                    <th scope="row">
+                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
+                            <option value="0" disabled selected>Seleccionar producto</option>
+                            {% for product in productos %}
+                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+                    <td><input type="text" class="form-control cantidad-producto" placeholder="1" aria-label="Cantidad" oninput="multiplicacion(this)"></td>
+                    <td><input type="text" class="form-control precio-producto" placeholder="0,00" aria-label="Precio" oninput="multiplicacion(this)"></td>
+                    <td><input type="number" class="form-control resultado-multiplicacion" readonly placeholder="0,00" aria-label="Subtotal"></td>
+                    <td><input type="text" class="form-control descuento" aria-label="Descuento" oninput="multiplicacion(this)" placeholder="0 %"></td>
+                    <td><input type="text" class="form-control total-fin" readonly aria-label="Total"></td>
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para ver todas las columnas.</p>
+
+    <div class="app-quote-actions">
+        <button type="button" class="btn btn-primary" onclick="insertarProducto()">Agregar producto</button>
+        <button type="button" class="btn btn-outline-danger" onclick="eliminarTodos()">Limpiar productos</button>
+    </div>
+
+    <div class="app-quote-total">
+        <label for="total-general"><strong>Total general</strong></label>
+        <input type="text" id="total-general" readonly placeholder="0,00" class="form-control">
+    </div>
+</section>
+
+<section class="app-rate-panel" aria-label="Tasas de referencia">
+    <div class="app-rate-field">
+        <label for="tasaBcvDolar">Tasa BCV · Dólar</label>
+        <input type="text" id="tasaBcvDolar" class="form-control" readonly placeholder="Buscando tasa...">
+    </div>
+    <div class="app-rate-field">
+        <label for="tasaBcvEuro">Tasa BCV · Euro</label>
+        <input type="text" id="tasaBcvEuro" class="form-control" readonly placeholder="Buscando tasa...">
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function insertarProducto() {
+    const cuerpoTabla = document.getElementById('cuerpo-tabla');
+    const nuevaFila = document.createElement('tr');
+
+    nuevaFila.innerHTML = `
+        <th scope="row">
+            <select class="form-select" name="producto" aria-label="Seleccionar producto">
+                <option value="0" disabled selected>Selecciona un producto</option>
+                <option value="1">producto 1</option>
+                <option value="2">producto 2</option>
+                <option value="3">producto 3</option>
+                <option value="4">producto 4</option>
+                <option value="5">producto 5</option>
+                <option value="6">producto 6</option>
+            </select>
+        </th>
+        <td><input type="text" class="form-control cantidad-producto" placeholder="1" aria-label="Cantidad" oninput="multiplicacion(this)"></td>
+        <td><input type="text" class="form-control precio-producto" placeholder="0,00" aria-label="Precio" oninput="multiplicacion(this)"></td>
+        <td><input type="number" class="form-control resultado-multiplicacion" readonly placeholder="0,00" aria-label="Subtotal"></td>
+        <td><input type="text" class="form-control descuento" aria-label="Descuento" oninput="multiplicacion(this)" placeholder="0 %"></td>
+        <td><input type="text" class="form-control total-fin" readonly aria-label="Total"></td>
+        <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+    `;
+    cuerpoTabla.appendChild(nuevaFila);
+}
+
+function eliminarTodos() {
+    const cuerpoTabla = document.getElementById('cuerpo-tabla');
+
+    if (confirm('¿Estás seguro de que deseas eliminar todos los productos?')) {
+        cuerpoTabla.innerHTML = `
+            <tr>
+                <th scope="row">
+                    <select class="form-select" name="producto" aria-label="Seleccionar producto">
+                        <option value="0" disabled selected>Seleccionar producto</option>
+                        {% for product in productos %}
+                        <option value="{{ product.CODIGO }}">{{ product.NOMBRE }}</option>
+                        {% endfor %}
+                    </select>
+                </th>
+                <td><input type="text" class="form-control cantidad-producto" placeholder="1" aria-label="Cantidad" oninput="multiplicacion(this)"></td>
+                <td><input type="text" class="form-control precio-producto" placeholder="0,00" aria-label="Precio" oninput="multiplicacion(this)"></td>
+                <td><input type="number" class="form-control resultado-multiplicacion" readonly placeholder="0,00" aria-label="Subtotal"></td>
+                <td><input type="text" class="form-control descuento" aria-label="Descuento" oninput="multiplicacion(this)" placeholder="0 %"></td>
+                <td><input type="text" class="form-control total-fin" readonly aria-label="Total"></td>
+                <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+            </tr>
+        `;
+        calcularTotalGeneral();
+    }
+}
+</script>
+{% endblock %}

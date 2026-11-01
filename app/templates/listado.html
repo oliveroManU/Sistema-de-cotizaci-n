@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario | Velazcres{% endblock %}
+{% block head %}
+    <script src="{{ url_for('static', filename='js/FuncionesInsert.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Control de existencias</span>
+        <h1>Inventario</h1>
+        <p>Consulta los costos, precios y cantidades registrados.</p>
+    </div>
+</section>
+
+<section class="table-responsive app-inventory-table">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Producto</th>
+                <th scope="col">Marca</th>
+                <th scope="col">Moneda</th>
+                <th scope="col">Costo</th>
+                <th scope="col">Cantidad</th>
+                <th scope="col">Precio por unidad</th>
+                <th scope="col">Tasa de compra</th>
+                <th scope="col">Conversión</th>
+                <th scope="col">Precio de venta</th>
+                <th scope="col">Ganancia (USD)</th>
+                <th scope="col">Ganancia (Bs.)</th>
+                <th scope="col">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in productos %}
+            <tr>
+                <th scope="row">{{ producto.id }}</th>
+                <td class="app-product-name-cell">{{ producto.nombre }}</td>
+                <td>{{ producto.marca }}</td>
+                <td><span class="app-currency-chip">{{ producto.moneda }}</span></td>
+                <td>{{ producto.precio }}</td>
+                <td>{{ producto.cantidad }}</td>
+                <td>{{ producto.precioporunidad }}</td>
+                <td>{{ producto.tasapago }}</td>
+                <td>USD {{ producto.precioD }}</td>
+                <td>Bs. {{ producto.precio_venta }}</td>
+                <td>USD {{ producto.ganancia_estimadaD }}</td>
+                <td>Bs. {{ producto.ganancia_estimadaBs }}</td>
+                <td>
+                    <div class="app-row-actions">
+                        <a class="btn btn-outline-warning" href="{{ url_for('editar_productos1', productos_id=producto['id']) }}">Ver detalle</a>
+                        <form action="{{ url_for('eliminar_producto1', productos_id=producto.id) }}" method="post">
+                            <button class="btn btn-outline-danger" onclick="return confirm('¿Confirmar?')">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="13" class="app-empty-cell">Todavía no hay productos registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+<p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para consultar todos los datos.</p>
+{% endblock %}

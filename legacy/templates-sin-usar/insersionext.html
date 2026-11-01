@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/FuncionesInsert.js') }}" defer></script>
+    <title>Document</title>
+</head>
+<body>
+<header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Velazcres</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarText">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Registro</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('mostrador') }}">Productos</a>
+        </li>
+      </ul>
+      <span class="navbar-text">
+        Eslogan
+      </span>
+    </div>
+  </div>
+</nav>
+</header>
+
+<div class="contenedor-formularios">
+  <div  class="rounded-top border-success rounded-top" >
+    <form  action="{{ url_for('cotizacion_int') }}" method="POST" >
+        <table style="width: 85%; min-height: 40%; margin-left: auto; margin-right: auto;" class="table table-striped table-bordered bg-white table-sm ">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Producto</th>
+                    <th>Marca</th>
+                    <th>Moneda</th>
+                    <th>Gastado</th>
+                    <th>Cantidad</th>
+                    <th>Precio por unidad</th>
+                    <th>Tasapago</th>
+                    <th>Conversion</th>
+                    <th>Precio de Venta</th>
+                    <th>Total: </th>
+                    <th>Total $:</th>
+                    <th>Total Bs.:</th>
+                    <th>Enviar</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input class="form-control" type="text" name="nombre-producto"></td>
+                    <td><input class="form-control" type="text" name="marca"></td>
+                    <td><input class="form-control" type="text" name="moneda" value="Bs." readonly></td>
+                    <td><input class="form-control precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto"></td>
+                    <td><input class="form-control cantidad-producto" type="number" oninput="multiplicacion(this)" name="cantidad-producto"></td>
+                    <td><input class="ValorPorUnidad form-control" type="text" name="precio-por-unidad" readonly></td>
+                    <td><input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv) if tasa_bcv else '' }}" oninput="multiplicacion(this)" readonly></td>
+                    <td><input class="form-control preciocompra " type="text" name="preciod" oninput="multiplicacion(this)"></td>
+                    <td><input class="form-control precioventa" type="text" name="precioventa" oninput="multiplicacion(this)"></td>
+                    <td></td>
+                    <td><input type="number" class="form-control total-fin" readonly></td>
+                    <td><input type="number" class="form-control total-fin2" readonly> </td>
+                    <td><button style="margin-top: 15px;" class="btn btn-primary" type="submit"> Realizar</button></td>
+                </tr>
+            </tbody>
+            
+ 
+    
+        </table>
+        
+    </form>
+  </div>
+
+  
+
+
+</div>
+
+<div>
+  <table  style="width: 75%; margin-left: auto; margin-right: auto;" class="table table-striped table-bordered bg-white table-sm ">
+    <thead class="table-success">
+      <tr>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      </tr>
+
+    </thead>
+    <tbody>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        
+
+
+      </tr>
+
+
+
+    </tbody>
+  </table>
+</div>
+
+
+</body>
+</html>

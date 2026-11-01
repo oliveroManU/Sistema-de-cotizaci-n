@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Registro de producto | Velazcres{% endblock %}
+{% block head %}
+    <script src="{{ url_for('static', filename='js/FuncionesInsert.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Inventario</span>
+        <h1 class="h1-insersion">Registro de producto</h1>
+        <p>Registra el costo, la cantidad y el precio de venta del producto.</p>
+    </div>
+</section>
+
+<section class="contenedor-tabla-insersion">
+    <div>
+        <form action="{{ url_for('cotizacion_int') }}" method="POST">
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th scope="col">Producto</th>
+                            <th scope="col">Marca</th>
+                            <th scope="col">Moneda</th>
+                            <th scope="col">Costo total</th>
+                            <th scope="col">Cantidad</th>
+                            <th scope="col">Precio por unidad</th>
+                            <th scope="col">Tasa de cambio</th>
+                            <th scope="col">Conversión</th>
+                            <th scope="col">Precio de venta</th>
+                            <th scope="col">Ganancia estimada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input class="form-control" type="text" name="nombre" aria-label="Producto"></td>
+                            <td><input class="form-control" type="text" name="marca" aria-label="Marca"></td>
+                            <td><input class="form-control input-corto-insersion" type="text" name="moneda" value="Bs." readonly aria-label="Moneda"></td>
+                            <td><input class="form-control precio-producto" type="number" oninput="multiplicacion(this)" name="precio-producto" aria-label="Costo total"></td>
+                            <td><input class="form-control input-corto-insersion cantidad-producto" type="number" min="1" value="1" oninput="multiplicacion(this)" name="cantidad-producto" aria-label="Cantidad"></td>
+                            <td>
+                                <div class="input-group">
+                                    <span class="input-group-text">Bs.</span>
+                                    <input class="form-control precioporunidad" type="text" name="precioporunidad" readonly aria-label="Precio por unidad">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="app-stacked-inputs">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input class="form-control tasapago" type="text" name="tasapago" value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" oninput="multiplicacion(this)" readonly aria-label="Tasa del dólar">
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text">€</span>
+                                        <input class="form-control tasapagoE" type="text" name="tasapagoE" value="{{ '%.2f'|format(tasa_bcv_euro) if tasa_bcv_euro else '' }}" oninput="multiplicacion(this)" readonly aria-label="Tasa del euro">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="app-stacked-inputs">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input class="form-control preciod" type="text" name="preciod" oninput="multiplicacion(this)" aria-label="Conversión a dólares">
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text">€</span>
+                                        <input class="form-control precioe" type="text" name="precioe" oninput="multiplicacion(this)" aria-label="Conversión a euros">
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="input-group">
+                                    <span class="input-group-text">Bs.</span>
+                                    <input class="form-control precio-venta" type="text" name="precio-venta" oninput="multiplicacion(this)" aria-label="Precio de venta">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="app-stacked-inputs">
+                                    <div class="input-group">
+                                        <span class="input-group-text">$</span>
+                                        <input class="form-control preciod gananciaD" type="text" name="gananciaD" oninput="multiplicacion(this)" readonly aria-label="Ganancia en dólares">
+                                    </div>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Bs.</span>
+                                        <input class="form-control precio-venta gananciaBs" type="text" name="gananciaBs" oninput="multiplicacion(this)" readonly aria-label="Ganancia en bolívares">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para completar todos los campos.</p>
+            <div class="app-form-actions">
+                <button class="btn btn-primary" type="submit">Guardar producto</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

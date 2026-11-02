@@ -5,6 +5,9 @@
     <script src="{{ url_for('static', filename='js/FuncionesEditar.js') }}" defer></script>
 {% endblock %}
 {% block content %}
+
+
+
 <section class="app-page-header">
     <div>
         <span class="app-eyebrow">Inventario · Detalle del producto</span>
@@ -12,134 +15,146 @@
     </div>
 </section>
         
-    <div class="form-group rounded-top rounded-top contenedorEDTiIma"></div>
+<div class="contenedor-inputs">
+
         <div>
            
-        <div class="TituloImaED">
-        <h6 class="h6-lote-EditList" >Lote #{{productos['id']}}</h4>
-        <h1 class="h1-producto-EditList">{{productos['nombre']}}</h2>
-        <h3 class="h3-marca-EditList ">{{productos['marca']}}</h3>
-        </div>
-    <aside>
+            <div class="TituloImaED">
+            <h6 class="h6-lote-EditList" >Lote #{{productos['id']}}</h4>
+            <h1 class="h1-producto-EditList">{{productos['nombre']}}</h2>
+            <h3 class="h3-marca-EditList ">{{productos['marca']}}</h3> 
+            </div>
+
+            <aside>
         
-        <div class="TituloImaED">
-       <aside class=" app-image-card">
-        <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + productos['id']|string + '.jpg') }}" alt="Imagen de {{ productos['nombre'] }}">
-        <div class="card-body">
+            <div class="TituloImaED">
+            <aside class=" app-image-card">
+            <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + productos['id']|string + '.jpg') }}" alt="Imagen de {{ productos['nombre'] }}">
+            <div class="card-body">
             <h2 class="card-title">Imagen del producto</h2>
             <p class="card-text">Fotografía asociada al lote #{{ productos['id'] }}.</p>
-        </div>
-        </div>
-    </aside>
+            </div>
+            </div>
+
+            </aside>
+        
         </div>
     
-
+    <div style="width: 52%; margin-left: 5%;">
     
-       <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">      
-
+    <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">      
+        
         <input type="hidden" name="nombre_producto" value="{{productos['nombre']}}">
         <input type="hidden" name="marca_producto" value="{{productos['marca']}}">
-
-
-        <table>
-            <thead>
-                <th>Valor unitario de producto:</th>
-                <th>cantidad:</th>
-                <th>Precio:</th>
-                <th>tasapago:</th>
-                <th>TasaBCV Hoy:</th>
-                <th>Porcentaje de ganancia</th>
-                <th>Precio de Venta:</th>
-                <th>Ganancia en USD $.:</th>
-                <th>Ganancia Bolivares:</th>
-                <th>Ganancia Sobre costo:</th>
-                <th>Margen de Ganancia:</th>
-                <th>Monto IVA:</th>
-                <th>Precio con IVA:</th>
-            </thead>
-                
-            <tbody>
         
-                <tr>
-                <td>
-
-                <!-- valor unitario del producto (Suelto) -->
-
-                <input type="text" class=" precioporunidad" name="precioporunidad" id="precioporunidad" 
-                value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
-
-                <td> <input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
-                value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> 
-                </td>
-
-                <!-- Precio del pŕoducto despues de multiplicar el precio por unidad y la cantidad -->
-
-                <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
-                value="{{productos['precio']}}" required oninput="multiplicacion(this)" ></td>                
-                
-                <!-- Precio del producto en dolares -->
-
-                <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
-
-                <!-- Tasa a la que se pago el producto originalmente -->
-
-                <td><input type="text" class="form-control tasapago" name="tasapago" id="tasapago" aria-label="Amount (to the nearest dollar)"
-                value="{{productos['tasapago']}}" required oninput="multiplicacion(this)" readonly></td>
-
-                <!-- Consulta de la tasa de pago del día -->
-
-                <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
-                value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly ></td>
-
-                <!-- Porcentaje para sacar los valores -->
-
-                <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
-                required oninput="multiplicacion(this)"> </td>
-
-                <!--Precio de venta-->
-
-                <td> <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-                value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
-
-                <!-- Ganancia Sobre costo -->
-
-                <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+        <div class="contenedor-inputs">
             
-                <!-- Margen de ganancia -->
+            <!-- valor unitario del producto (Suelto) -->
 
-                <td><input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
-                readonly></td>
+            <lAbel>Valor unitario de producto:</lAbel>
+            <input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
+             value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)">
+            
+            <!-- Cantidad del producto -->
 
-                <!-- Monto del IVA -->
+            <label for="">cantidad:</label>
+            <input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+            value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> 
+            
+            <!-- Precio del pŕoducto despues de multiplicar el precio por unidad y la cantidad -->
+            
+            <label for="">Precio:</label>
+            <input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+            value="{{productos['precio']}}" required oninput="multiplicacion(this)" >                
+         
+        </div>
 
-                <td><input type="text" class="form-control monto-iva" name="monto-iva" id="monto-iva" aria-label="Amount (to the nearest dollar)"
-                readonly></td>
+        <div class="contenedor-inputs">
 
-                <!-- precio con IVA Bs. -->
+            <!-- Tasa a la que se pago el producto originalmente -->
 
-                <td><input type="text" class="form-control precio-con-iva" name="precio-con-iva" id="precio-con-iva" aria-label="Amount (to the nearest dollar)"
-                readonly></td>
+            <label for="">tasapago::</label>
+            <input type="text" class="form-control tasapago" name="tasapago" id="tasapago" aria-label="Amount (to the nearest dollar)"
+            value="{{productos['tasapago']}}" required oninput="multiplicacion(this)" readonly>
 
-                <!-- precio con IVA USD $. -->
+            <!-- Consulta de la tasa de pago del día -->
 
-                <td><input type="text" class="form-control monto-iva-d" name="monto-iva-d" id="monto-iva-d" aria-label="Amount (to the nearest dollar)"
-                readonly></td>
-            </tbody>
-        </table>
-                   
-    
+            <label for="">TasaBCV Hoy:</label>
+            <input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+            value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly>
+
+        </div>
+
+        <div class="contenedor-inputs">
+            
+            <!-- Porcentaje para sacar los valores -->
+
+            <label for=""> Porcentaje de ganancia</label>
+            <input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+            required oninput="multiplicacion(this)"> 
+
+            <!--Precio de venta-->
+            
+            <label for="">Precio de Venta:</label>
+             <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+             value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)">
+            
+            <!--Precio de venta $-->
+
+             <label for="">Precio $</label>
+             <input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly>
+            
+        </div>
+
+        <div class="contenedor-inputs">
+
+            <!-- Ganancia Sobre costo -->
+
+             <label for="">Ganancia Sobre costo:</label>
+             <input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly>
+            
+            
+             <!-- Margen de ganancia -->
+            
+             <label for="">Margen de Ganancia:</label>
+             <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+             readonly>
+
+        </div>
+        
+        <div class="contenedor-inputs">
+        
+            <!-- Monto del IVA -->
+            
+            <label for="">Monto de IVA</label>
+            <input type="text" class="form-control monto-iva" name="monto-iva" id="monto-iva" aria-label="Amount (to the nearest dollar)"
+            readonly>
+            
+            <!-- precio con IVA Bs. -->
+            
+            <label for="">Monto IVA:</label>
+            <input type="text" class="form-control precio-con-iva" name="precio-con-iva" id="precio-con-iva" aria-label="Amount (to the nearest dollar)"
+            readonly>
+            
+            <!-- precio con IVA USD $. -->
+            
+            <label for="">Precio con IVA:</label>
+            <input type="text" class="form-control monto-iva-d" name="monto-iva-d" id="monto-iva-d" aria-label="Amount (to the nearest dollar)"
+            readonly>
+
+        </div>
+
+                
+
         <button type="submit" class="btn btn-outline-info">Guardar</button>
-            <button class="btn btn-outline-danger boton-decoracion text-decoration-none" >
-                <a class="boton-decoracion" href="{{ url_for('registros_cotizaciones')}}">cancelar</a>
-            </button>
+        
+        <button class="btn btn-outline-danger boton-decoracion text-decoration-none" >
+            <a class="boton-decoracion" href="{{ url_for('registros_cotizaciones')}}">cancelar</a>
+        </button>
 
     </form>
     
-  
-
-    
-
-
+    </div>
 
     
 {% endblock %}

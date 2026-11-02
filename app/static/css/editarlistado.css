@@ -43,3 +43,13 @@
 .TituloImaED{
     width: 50%;
 }
+
+.contenedor-inputs {
+    display: flex;
+    gap: 10px; /* Espacio opcional entre los inputs */
+    margin-bottom: 5px;
+  }
+
+.contenedor-inputs input {
+    flex: 1; /* Hace que ocupen el mismo ancho de forma proporcional */
+}

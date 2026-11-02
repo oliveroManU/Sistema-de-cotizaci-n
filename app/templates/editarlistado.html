@@ -11,237 +11,131 @@
         <p>Consulta y actualiza los datos de costo y rentabilidad.</p>
     </div>
 </section>
-
-<div class="contenedor-formularios app-detail-layout">
-    <div class="form-group rounded-top">
-       <h6 class="h6-lote-EditList">Lote #{{ productos['id'] }}</h6>
         
-    
-       <div  class="contenedor-formularios">
-    <div class="form-group rounded-top rounded-top">
+    <div class="form-group rounded-top rounded-top contenedorEDTiIma"></div>
+        <div>
            
-       <h6 class="h6-lote-EditList" >Lote #{{productos['id']}}</h4>
-       <h1 class="h1-producto-EditList">{{productos['nombre']}}</h2>
-       <h3 class="h3-marca-EditList ">{{productos['marca']}}</h3>
+        <div class="TituloImaED">
+        <h6 class="h6-lote-EditList" >Lote #{{productos['id']}}</h4>
+        <h1 class="h1-producto-EditList">{{productos['nombre']}}</h2>
+        <h3 class="h3-marca-EditList ">{{productos['marca']}}</h3>
+        </div>
+    <aside>
+        
+        <div class="TituloImaED">
+       <aside class=" app-image-card">
+        <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + productos['id']|string + '.jpg') }}" alt="Imagen de {{ productos['nombre'] }}">
+        <div class="card-body">
+            <h2 class="card-title">Imagen del producto</h2>
+            <p class="card-text">Fotografía asociada al lote #{{ productos['id'] }}.</p>
+        </div>
+        </div>
+    </aside>
+        </div>
+    
+
     
        <form method="POST" action="{{ url_for('actualizar_productos1', productos_id=productos['id'])}}">      
 
         <input type="hidden" name="nombre_producto" value="{{productos['nombre']}}">
         <input type="hidden" name="marca_producto" value="{{productos['marca']}}">
 
-        <label for="">Valor unitario de producto:</label><br>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV.</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input type="text" class="form-control precioporunidad" name="precioporunidad" id="precioporunidad" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)">
-        </div>
 
-        <label for="">cantidad:</label><br>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">+</span>
-        <span class="input-group-text">-</span>
-        </div>
-        <input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
-        value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> <br><br>
-        </div>        
+        <table>
+            <thead>
+                <th>Valor unitario de producto:</th>
+                <th>cantidad:</th>
+                <th>Precio:</th>
+                <th>tasapago:</th>
+                <th>TasaBCV Hoy:</th>
+                <th>Porcentaje de ganancia</th>
+                <th>Precio de Venta:</th>
+                <th>Ganancia en USD $.:</th>
+                <th>Ganancia Bolivares:</th>
+                <th>Ganancia Sobre costo:</th>
+                <th>Margen de Ganancia:</th>
+                <th>Monto IVA:</th>
+                <th>Precio con IVA:</th>
+            </thead>
+                
+            <tbody>
         
-        <label for="">Precio:</label><br>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
-        value="{{productos['precio']}}" required oninput="multiplicacion(this)" > <br><br>
-        </div>
+                <tr>
+                <td>
 
-        <label for="">tasapago:</label><br>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV.</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input type="text" class="form-control tasapago" name="tasapago" id="tasapago" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['tasapago']}}" required oninput="multiplicacion(this)" readonly>
-        </div>
-        
-        
+                <!-- valor unitario del producto (Suelto) -->
 
-        <label for="">TasaBCV Hoy:</label>
-        
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
-        value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly >
-        </div>
-                 
-        <label for="">Porcentaje de ganancia</label>
-        
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        
-        <span class="input-group-text">%</span>
-        </div>
-        <input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
-        required oninput="multiplicacion(this)"> 
-        </div>
+                <input type="text" class=" precioporunidad" name="precioporunidad" id="precioporunidad" 
+                value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
 
-        <label for="">Precio de Venta:</label><br>
-        
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV.</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)">
-        </div>
+                <td> <input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+                value="{{productos['cantidad']}}" required oninput="multiplicacion(this)"> 
+                </td>
 
-       <!-- <label for="">precio en USD $:</label><br>
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">USD</span>
-        <span class="input-group-text">$</span>
-        </div>
-        <input class="preciod form-control" type="text" name="preciod" id="preciod"
-        value="{{productos['precioD']}}" required oninput="multiplicacion(this)"> <br><br>
-        </div>
-        -->
+                <!-- Precio del pŕoducto despues de multiplicar el precio por unidad y la cantidad -->
 
-        <!--
+                <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+                value="{{productos['precio']}}" required oninput="multiplicacion(this)" ></td>                
+                
+                <!-- Precio del producto en dolares -->
 
-        <label for="">precio en USD $ hoy:</label><br>
-        
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">USD</span>
-        <span class="input-group-text">$</span>
-        </div>
-        <input type="text" class="form-control preciod1" name="preciod1" id="preciod1" aria-label="Amount (to the nearest dollar)"
-        required readonly>
-        </div>
+                <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
 
-        
-        <label for="">Ganancia estimada dia de compra</label><br>
+                <!-- Tasa a la que se pago el producto originalmente -->
 
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">USD</span>
-        <span class="input-group-text">$</span>
-        </div>
-        <input type="text" class="form-control gananciaD" name="gananciaD" id="gananciaD" aria-label="Amount (to the nearest dollar)"
-        value="{{productos['ganancia_estimadaD']}}" required oninput="multiplicacion(this)" readonly>
-        </div>
+                <td><input type="text" class="form-control tasapago" name="tasapago" id="tasapago" aria-label="Amount (to the nearest dollar)"
+                value="{{productos['tasapago']}}" required oninput="multiplicacion(this)" readonly></td>
 
-        -->
+                <!-- Consulta de la tasa de pago del día -->
 
-        <label for="">Ganancia en USD $.:</label><br>
+                <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+                value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly ></td>
 
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">USD</span>
-        <span class="input-group-text">$</span>
-        </div>
-        <input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly>
-        </div>
+                <!-- Porcentaje para sacar los valores -->
 
-        <label for="">Ganancia Bolivares:</label><br>
-  
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        
-        <input type="text" class="form-control gananciaBs" name="gananciaBs" id="gananciaBs" readonly>
-        </div>
+                <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+                required oninput="multiplicacion(this)"> </td>
 
+                <!--Precio de venta-->
 
-        <label for="">Ganancia Sobre costo:</label><br>
+                <td> <input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+                value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
 
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text">BCV</span>
-        <span class="input-group-text">Bs.</span>
-        </div>
-        <input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)"
-        readonly>
-        </div>
+                <!-- Ganancia Sobre costo -->
 
-       
+                <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+            
+                <!-- Margen de ganancia -->
 
-        <label for="">Margen de Ganancia:</label><br>
-  
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text"> % </span>
-        </div>
-        <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
-         readonly>
-        </div>
+                <td><input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+                readonly></td>
 
-        
+                <!-- Monto del IVA -->
 
-        <div>
-        
-        <label for="">Monto IVA:</label><br>
-  
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text"> BCV. </span>
-        <span class="input-group-text"> Bs. </span>
-        </div>
-        <input type="text" class="form-control monto-iva" name="monto-iva" id="monto-iva" aria-label="Amount (to the nearest dollar)"
-         readonly>
-        </div>
+                <td><input type="text" class="form-control monto-iva" name="monto-iva" id="monto-iva" aria-label="Amount (to the nearest dollar)"
+                readonly></td>
 
-        <label for="">Precio con IVA:</label><br>
-  
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text"> BCV. </span>
-        <span class="input-group-text"> Bs. </span>
-        </div>
-        <input type="text" class="form-control precio-con-iva" name="precio-con-iva" id="precio-con-iva" aria-label="Amount (to the nearest dollar)"
-         readonly>
-        </div>
+                <!-- precio con IVA Bs. -->
 
-        <label for="">Precio con IVA:</label><br>
-  
-        <div class="input-group mb-3">
-        <div class="input-group-prepend">
-        <span class="input-group-text"> BCV. </span>
-        <span class="input-group-text"> Bs. </span>
-        </div>
-        <input type="text" class="form-control monto-iva-d" name="monto-iva-d" id="monto-iva-d" aria-label="Amount (to the nearest dollar)"
-         readonly>
-        </div>
+                <td><input type="text" class="form-control precio-con-iva" name="precio-con-iva" id="precio-con-iva" aria-label="Amount (to the nearest dollar)"
+                readonly></td>
 
-        </div>
+                <!-- precio con IVA USD $. -->
 
-            <button type="submit" class="btn btn-outline-info">Guardar</button>
+                <td><input type="text" class="form-control monto-iva-d" name="monto-iva-d" id="monto-iva-d" aria-label="Amount (to the nearest dollar)"
+                readonly></td>
+            </tbody>
+        </table>
+                   
+    
+        <button type="submit" class="btn btn-outline-info">Guardar</button>
             <button class="btn btn-outline-danger boton-decoracion text-decoration-none" >
                 <a class="boton-decoracion" href="{{ url_for('registros_cotizaciones')}}">cancelar</a>
             </button>
-    </div>
 
     </form>
     
-    <aside class="card form-group app-image-card">
-        <img class="editar-img" src="{{ url_for('static', filename='img/productos/' + productos['id']|string + '.jpg') }}" alt="Imagen de {{ productos['nombre'] }}">
-        <div class="card-body">
-            <h2 class="card-title">Imagen del producto</h2>
-            <p class="card-text">Fotografía asociada al lote #{{ productos['id'] }}.</p>
-        </div>
-    </aside>
-</div>
+  
 
     
 

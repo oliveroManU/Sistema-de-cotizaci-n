@@ -20,7 +20,7 @@
             <h2>{{ producto.nombre }}</h2>
             <p class="product-brand">{{ producto.marca }}</p>
             <span class="app-product-price">Precio: {{ producto.moneda }} {{ producto.precio }}</span>
-            <span class="app-product-stock">Existencia: {{ producto.cantidad }}</span>
+            <span class="app-product-stock">Cantidad: {{ producto.cantidad }}</span>
         </div>
         <div class="app-product-actions">
             <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('editar_producto', producto_id=producto['id']) }}">Editar</a>

@@ -2,36 +2,26 @@ import os
 import sqlite3
 import requests
 from functools import wraps
-
 import pdfkit
 import urllib3
 from bs4 import BeautifulSoup
 from PIL import Image
-
-from flask import (render_template, request, redirect, url_for,
-                   flash, make_response, current_app)
-from flask_login import (UserMixin, login_user, logout_user,
-                         login_required, current_user)
+from flask import render_template, request, redirect, url_for, flash, make_response, current_app
+from flask_login import UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
 from . import app, login_manager
 
 urllib3.disable_warnings()
-
 UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'static', 'img', 'productos')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-# ─────────────────────────────────────────────
-# DB
-# ─────────────────────────────────────────────
 def connect_db():
     return sqlite3.connect(
         os.path.join(current_app.instance_path, "Velazcress.db")
     )
 
-# ─────────────────────────────────────────────
+
 # MODELO USUARIO + LOADER
-# ─────────────────────────────────────────────
+
 class Usuario(UserMixin):
     def __init__(self, id, nombre, email, nivel, activo=True):
         self.id = int(id)
@@ -62,9 +52,10 @@ def load_user(user_id):
         return Usuario(row['id'], row['nombre'], row['email'], row['nivel'], row['activo'])
     return None
 
-# ─────────────────────────────────────────────
+
 # DECORADOR ADMIN
-# ─────────────────────────────────────────────
+# No se como funciona, pero es importante
+
 def admin_required(f):
     @wraps(f)
     @login_required
@@ -76,7 +67,7 @@ def admin_required(f):
     return wrapper
 
 # ─────────────────────────────────────────────
-# UTIL: TASA BCV
+# OBTENER TASA BCV
 # ─────────────────────────────────────────────
 def obtener_tasa_bcv(moneda="euro"):
     url = 'https://www.bcv.org.ve'
@@ -99,9 +90,8 @@ def obtener_tasa_bcv(moneda="euro"):
         print(f"Error al obtener tasa BCV ({moneda}): {e}")
     return None
 
-# ─────────────────────────────────────────────
 # HOME
-# ─────────────────────────────────────────────
+
 @app.route('/')
 def home():
     conn = connect_db()
@@ -114,6 +104,9 @@ def home():
 # ─────────────────────────────────────────────
 # LOGIN / LOGOUT
 # ─────────────────────────────────────────────
+
+# Inicio de sesión
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -147,6 +140,7 @@ def login():
 
     return render_template('login.html')
 
+# cierre de sesión
 
 @app.route('/logout')
 @login_required
@@ -156,7 +150,7 @@ def logout():
     return redirect(url_for('login'))
 
 # ─────────────────────────────────────────────
-# ADMIN: USUARIOS
+# ADMIN: Apartado de administración de usuarios
 # ─────────────────────────────────────────────
 @app.route('/admin/usuarios')
 @admin_required
@@ -169,6 +163,7 @@ def admin_usuarios():
     conn.close()
     return render_template('admin_usuarios.html', usuarios=usuarios)
 
+# Introducir a nuevo usuario
 
 @app.route('/admin/usuarios/nuevo', methods=['POST'])
 @admin_required
@@ -201,6 +196,7 @@ def admin_crear_usuario():
 
     return redirect(url_for('admin_usuarios'))
 
+# Seguridad: No permitir que un administrador se desactive o elimine a sí mismo
 
 @app.route('/admin/usuarios/<int:user_id>/toggle', methods=['POST'])
 @admin_required
@@ -216,6 +212,7 @@ def admin_toggle_usuario(user_id):
     flash('Estado del usuario actualizado.', 'si')
     return redirect(url_for('admin_usuarios'))
 
+# Restablecer contraseña de un usuario
 
 @app.route('/admin/usuarios/<int:user_id>/reset', methods=['POST'])
 @admin_required
@@ -235,6 +232,7 @@ def admin_reset_password(user_id):
     flash('Contraseña actualizada.', 'si')
     return redirect(url_for('admin_usuarios'))
 
+# Eliminar usuario
 
 @app.route('/admin/usuarios/<int:user_id>/eliminar', methods=['POST'])
 @admin_required
@@ -253,6 +251,7 @@ def admin_eliminar_usuario(user_id):
 # ─────────────────────────────────────────────
 # MOSTRADOR
 # ─────────────────────────────────────────────
+
 @app.route('/mostrador')
 @login_required
 def mostrador():
@@ -263,7 +262,7 @@ def mostrador():
     return render_template('mostrador.html', productos=productos)
 
 # ─────────────────────────────────────────────
-# PRODUCTO: EDITAR / ACTUALIZAR / IMAGEN
+# PRODUCTO: INTRODUCIR / EDITAR / ACTUALIZAR / IMAGEN
 # ─────────────────────────────────────────────
 @app.route('/producto/<int:producto_id>')
 @login_required
@@ -469,7 +468,7 @@ def eliminar_producto1(productos_id):
     return redirect(url_for('registros_cotizaciones'))
 
 # ─────────────────────────────────────────────
-# CLIENTE
+# Registrar CLIENTES
 # ─────────────────────────────────────────────
 @app.route('/cliente/guardar', methods=['POST'])
 @login_required
@@ -497,7 +496,7 @@ def guardar_cliente():
     return redirect(url_for('home'))
 
 # ─────────────────────────────────────────────
-# PDF
+# Esta es la función para imprimir pdfs
 # ─────────────────────────────────────────────
 @app.route('/descargar_pdf/<int:id>')
 @login_required

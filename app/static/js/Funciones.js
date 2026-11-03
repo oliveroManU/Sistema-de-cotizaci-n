@@ -99,14 +99,14 @@ function multiplicacion(elemento) {
     if (fila.querySelector('.monto-iva')) {
         fila.querySelector('.monto-iva').value = PorcentajeDescuento.toFixed(2);
     }
-    if (fila.querySelector('.precio-con-iva')) {
-        fila.querySelector('.precio-con-iva').value = PrecioMasDescuento.toFixed(2);
+    if (fila.querySelector('.descuentobs')) {
+        fila.querySelector('.descuentobs').value = PrecioMasDescuento.toFixed(2);
     }
 
     // precio total con IVA incluido en dólares:
     const PrecioMasDescuentoDolar = TasaPagoProductoHoy !== 0 ? (PrecioMasDescuento / TasaPagoProductoHoy) : 0;
-    if (fila.querySelector('.monto-iva-d')) {
-        fila.querySelector('.monto-iva-d').value = PrecioMasDescuentoDolar.toFixed(2);
+    if (fila.querySelector('.descuentod')) {
+        fila.querySelector('.descuentod').value = PrecioMasDescuentoDolar.toFixed(2);
     }   
 
     /// const PrecioDolares = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProducto) : 0;
@@ -137,7 +137,7 @@ function calcularTotalGeneral() {
 
     // 1. Primero calculamos el total general sumando las filas
     filas.forEach(fila => {
-        const totalFila = parseFloat(fila.querySelector('.precio-con-iva').value) || 0;
+        const totalFila = parseFloat(fila.querySelector('.descuentobs').value) || 0;
         totalGeneral += totalFila;
     });
 

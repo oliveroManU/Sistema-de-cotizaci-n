@@ -16,7 +16,7 @@
 
 <section class="app-grid app-quote-details" aria-label="Datos de la cotización">
     
-       
+<!-- Div de registro de cotización -->
 
 <div class="app-card">
 
@@ -48,6 +48,8 @@
     </form>
 
 </div>
+
+    <!--Div de Form de datos de cotizacion-->
 
     <div class="app-card">
 
@@ -89,6 +91,8 @@
         <h2>Productos de la cotización</h2>
         <p>Agrega los productos requeridos y revisa sus importes.</p>
     </div>
+
+    <!-- Div de la tabla de cotizacion -->
 
     <div class="table-responsive">
         
@@ -153,9 +157,9 @@
                         <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
                     <td>
                         <div class="contenedor-inputs">
-                        <input type="text" class="form-control precio-con-iva" name="precio-con-iva" id="precio-con-iva" aria-label="Amount (to the nearest dollar)"
+                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
                         readonly>
-                        <input type="text" class="form-control monto-iva-d" name="monto-iva-d" id="monto-iva-d" aria-label="Amount (to the nearest dollar)"
+                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
                         readonly>
                         </div>
                     </td>
@@ -167,6 +171,8 @@
         </table>
     </div>
     <p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para ver todas las columnas.</p>
+
+    <!-- Botones de Agregar producto y eliminar productos-->
 
     <div class="app-quote-actions">
         <button type="button" class="btn btn-primary" onclick="insertarProducto()">Agregar producto</button>
@@ -200,6 +206,9 @@
 
 {% block scripts %}
 <script>
+
+// Funcion de Boton para insertar producto en la tabla
+
 function insertarProducto() {
     const cuerpoTabla = document.getElementById('cuerpo-tabla');
     const nuevaFila = document.createElement('tr');
@@ -247,9 +256,9 @@ function insertarProducto() {
 
                     <td>
                         <div class="contenedor-inputs">
-                        <input type="text" class="form-control precio-con-iva" name="precio-con-iva" id="precio-con-iva" aria-label="Amount (to the nearest dollar)"
+                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
                         readonly>
-                        <input type="text" class="form-control monto-iva-d" name="monto-iva-d" id="monto-iva-d" aria-label="Amount (to the nearest dollar)"
+                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
                         readonly>
                         </div>
                     </td>
@@ -261,27 +270,64 @@ function insertarProducto() {
     cuerpoTabla.appendChild(nuevaFila);
 }
 
+// Funcion de Boton de reseteo de productos
+
 function eliminarTodos() {
     const cuerpoTabla = document.getElementById('cuerpo-tabla');
 
     if (confirm('¿Estás seguro de que deseas eliminar todos los productos?')) {
         cuerpoTabla.innerHTML = `
             <tr>
-                <th scope="row">
-                    <select class="form-select" name="producto" aria-label="Seleccionar producto">
-                        <option value="0" disabled selected>Seleccionar producto</option>
-                        {% for product in productos %}
-                        <option value="{{ product.CODIGO }}">{{ product.NOMBRE }}</option>
-                        {% endfor %}
-                    </select>
-                </th>
-                <td><input type="text" class="form-control cantidad-producto" placeholder="1" aria-label="Cantidad" oninput="multiplicacion(this)"></td>
-                <td><input type="text" class="form-control precio-producto" placeholder="0,00" aria-label="Precio" oninput="multiplicacion(this)"></td>
-                <td><input type="number" class="form-control resultado-multiplicacion" readonly placeholder="0,00" aria-label="Subtotal"></td>
-                <td><input type="text" class="form-control descuento" aria-label="Descuento" oninput="multiplicacion(this)" placeholder="0 %"></td>
-                <td><input type="text" class="form-control total-fin" readonly aria-label="Total"></td>
-                <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
-            </tr>
+
+                    <th scope="row">
+                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
+                            <option value="0" disabled selected>Seleccionar producto</option>
+                            {% for product in productos %}
+                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+
+                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
+                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+                    value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
+                    
+                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+                    required oninput="multiplicacion(this)"> </td>
+
+                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
+
+                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
+
+                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+
+                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+                    readonly></td>
+
+                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
+                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
+
+                    <td>
+                        <div class="contenedor-inputs">
+                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        </div>
+                    </td>
+
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+                    
+                </tr>
         `;
         calcularTotalGeneral();
     }

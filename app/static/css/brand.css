@@ -1003,7 +1003,7 @@ body.app-body {
     margin-left: 0;
 }
 
-#total-general {
+#total-general, #monto-iva-bn {
     max-width: 240px !important;
     font-size: 1.2rem;
     font-weight: 700;

@@ -98,8 +98,10 @@ def home():
     conn.row_factory = sqlite3.Row
     productos = conn.execute('SELECT * FROM productos').fetchall()
     clientes  = conn.execute('SELECT * FROM clientes').fetchall()
+    tasa_bcv_dolar = obtener_tasa_bcv("dolar")
+    
     conn.close()
-    return render_template('index.html', productos=productos, clientes=clientes)
+    return render_template('index.html', productos=productos, clientes=clientes, tasa_bcv_dolar=tasa_bcv_dolar)
 
 # ─────────────────────────────────────────────
 # LOGIN / LOGOUT

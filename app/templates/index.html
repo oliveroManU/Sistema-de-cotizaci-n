@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+
+{% block title %}Cotización | Velazcres{% endblock %}
+{% block head %}
+    <script src="{{ url_for('static', filename='js/Funciones.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Área comercial</span>
+        <h1>Cotización</h1>
+        <p>Prepara una cotización con los datos del cliente y los productos solicitados.</p>
+    </div>
+</section>
+
+<section class="app-grid app-quote-details" aria-label="Datos de la cotización">
+    
+<!-- Div de registro de cotización -->
+
+<div class="app-card">
+
+    <div class="app-card-heading">
+        <h2>Información del cliente</h2>
+        <p>Datos de contacto y facturación</p>
+    </div>
+
+<!-- Registro de cliente -->
+
+    <form action="{{ url_for('guardar_cliente') }}" method="POST">
+        
+        <div class="">
+            
+            
+
+             <div class="app-form-field app-form-field--full">
+                <label class="form-label" for="nombre-cliente">Nombre del cliente</label>
+                <input id="nombre-cliente" name="nombre-cliente" class="form-control" placeholder="Nombre y apellido" 
+                type="text" oninput="pasarvalores()" required>
+            </div>
+
+            <div class="row contenedor-inputs">
+
+            <div class="">
+                <label class="form-label" for="direccion-cliente">RIF</label>
+                <input id="RIF" name="RIF" class="form-control" placeholder="23-000-0007"
+                type="text">
+            </div>
+
+            <div class="">
+                <label class="form-label" for="direccion-cliente">Dirección</label>
+                <input id="direccion-cliente" name="direccion-cliente" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+            </div>
+           
+            </div>
+
+            <div class="app-form-field app-form-field--full">
+                <label class="form-label" for="direccion-cliente">Email</label>
+                <input id="email" name="email" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+            </div>
+
+            <div class="app-form-field app-form-field--full">
+                <label class="form-label" for="direccion-cliente">Telefono</label>
+                <input id="telefono" name="telefono" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+            </div>
+
+            </div>
+
+            <div class="app-form-field app-form-field--full">
+                <button class="btn btn-primary" type="submit">Guardar cliente</button>
+            </div>
+
+        </div>
+    
+    </form>
+
+</div>
+
+    <!--Div de Form de datos de cotizacion-->
+
+    <div class="app-card">
+
+        <div class="app-card-heading">
+
+            <h2>Datos de cotización</h2>
+            <p>Moneda y condiciones de pago</p>
+        
+        </div>
+        
+        <div class="app-form-field mb-3">
+
+            <label class="form-label" for="tipo-moneda">Moneda</label>
+            <select class="form-select" name="tipo-moneda" id="tipo-moneda">
+                <option value="bs">Bolívares (Bs.)</option>                
+            </select>
+
+        </div>
+
+        <div class="app-form-field">
+            
+            <label class="form-label" for="Forma">Forma de pago</label>
+            
+            <select class="form-select" name="forma-pago" id="Forma">
+                <option value="bs">Transferencia bancaria</option>
+                <option value="dola">Efectivo</option>
+                <option value="">Pago móvil</option>  
+            </select>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="app-card mt-4">
+    
+    <div class="app-card-heading">
+        <h2>Productos de la cotización</h2>
+        <p>Agrega los productos requeridos y revisa sus importes.</p>
+    </div>
+
+    <!-- Div de la tabla de cotizacion -->
+
+    <form action="{{ url_for('guardar_cliente') }}">
+
+    <div class="table-responsive">
+        
+        <table class="table align-middle" id="tabla-productos">
+            
+            <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Precio Unitario</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Tasa de pago</th>
+                    <th scope="col">Porcentaje Ag.</th>
+                    <th scope="col">Valor Bs.</th>
+                    <th scope="col">Valor $.</th>
+                    <th scope="col">Ganancia Sob. Cost.</th>
+                    <th scope="col">Margen de Ganancia</th>
+                    <th scope="col">Descuento</th>
+                    <th scope="col">Total </th>
+                    <th scope="col">Eliminar</th>
+                </tr>
+            
+            </thead>
+            <tbody id="cuerpo-tabla">
+                <tr>
+
+                    <th scope="row">
+                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
+                            <option value="0" disabled selected>Seleccionar producto</option>
+                            {% for product in productos %}
+                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+
+                    <input type="hidden" class="nombre-cliente-c" >
+
+                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
+                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+                    value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
+                    
+                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+                    required oninput="multiplicacion(this)"> </td>
+
+                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
+
+                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
+
+                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+
+                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+                    readonly></td>
+
+                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
+                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
+                    <td>
+                        <div class="contenedor-inputs">
+                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        </div>
+                    </td>
+
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+                    
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para ver todas las columnas.</p>
+
+    <!-- Botones de Agregar producto y eliminar productos-->
+
+    <div class="app-quote-actions">
+        <button type="button" class="btn btn-primary" onclick="insertarProducto()">Agregar producto</button>
+        <button type="button" class="btn btn-outline-danger" onclick="eliminarTodos()">Limpiar productos</button>
+    </div>
+
+    <div class="app-quote-total">
+        <label for="total-general"><strong>Total general</strong></label>
+        <input type="text" id="total-general" readonly placeholder="0,00" class="form-control">
+        <label for="total-general"><strong>+ IVA</strong></label>
+        <input type="text" id="monto-iva-bn" readonly placeholder="0,00" class="form-control">
+    </div>
+</section>
+
+
+
+    </form>
+
+<!--
+
+<section class="app-rate-panel" aria-label="Tasas de referencia">
+    <div class="app-rate-field">
+        <label for="tasaBcvDolar">Tasa BCV · Dólar</label>
+        <input type="text" id="tasaBcvDolar" class="form-control" readonly placeholder="Buscando tasa...">
+    </div>
+    <div class="app-rate-field">
+        <label for="tasaBcvEuro">Tasa BCV · Euro</label>
+        <input type="text" id="tasaBcvEuro" class="form-control" readonly placeholder="Buscando tasa...">
+    </div>
+</section>
+
+-->
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+// Funcion de Boton para insertar producto en la tabla
+
+function insertarProducto() {
+    const cuerpoTabla = document.getElementById('cuerpo-tabla');
+    const nuevaFila = document.createElement('tr');
+
+    nuevaFila.innerHTML = `
+        
+                        <tr>
+
+                    <th scope="row">
+                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
+                            <option value="0" disabled selected>Seleccionar producto</option>
+                            {% for product in productos %}
+                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+
+                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
+                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+                    value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
+                    
+                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+                    required oninput="multiplicacion(this)"> </td>
+
+                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
+
+                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
+
+                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+
+                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+                    readonly></td>
+
+                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
+                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
+
+                    <td>
+                        <div class="contenedor-inputs">
+                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        </div>
+                    </td>
+
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+                    
+                </tr>
+    `;
+    cuerpoTabla.appendChild(nuevaFila);
+}
+
+// Funcion de Boton de reseteo de productos
+
+function eliminarTodos() {
+    const cuerpoTabla = document.getElementById('cuerpo-tabla');
+
+    if (confirm('¿Estás seguro de que deseas eliminar todos los productos?')) {
+        cuerpoTabla.innerHTML = `
+            <tr>
+
+                    <th scope="row">
+                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
+                            <option value="0" disabled selected>Seleccionar producto</option>
+                            {% for product in productos %}
+                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
+                            {% endfor %}
+                        </select>
+                    </th>
+
+                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
+                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+                    value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
+                    
+                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+                    required oninput="multiplicacion(this)"> </td>
+
+                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
+
+                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
+
+                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+
+                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+                    readonly></td>
+
+                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
+                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
+
+                    <td>
+                        <div class="contenedor-inputs">
+                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
+                        readonly>
+                        </div>
+                    </td>
+
+                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
+                    
+                </tr>
+        `;
+        calcularTotalGeneral();
+    }
+}
+</script>
+{% endblock %}

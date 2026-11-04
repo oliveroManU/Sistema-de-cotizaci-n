@@ -475,8 +475,11 @@ def eliminar_producto1(productos_id):
 @app.route('/cliente/guardar', methods=['POST'])
 @login_required
 def guardar_cliente():
-    nombre    = request.form.get('NAME_CLIENT', '').strip()
+    nombre    = request.form.get('nombre-cliente', '').strip()
+    rif = request.form.get('RIF', '').strip()
     direccion = request.form.get('direccion-cliente', '').strip()
+    email = request.form.get('email', '').strip()
+    telefono = request.form.get('telefono', '').strip()
 
     if not nombre:
         flash('El nombre del cliente es obligatorio.', 'no')
@@ -485,8 +488,8 @@ def guardar_cliente():
     conn = connect_db()
     try:
         conn.execute(
-            'INSERT INTO clientes (NAME_CLIENT, DELIVERY_LOCATION) VALUES (?, ?)',
-            (nombre, direccion)
+            'INSERT INTO clientes (nombre, RIF, direccion, email, telefono) VALUES (?, ?, ?, ?, ?)',
+            (nombre, rif, direccion, email, telefono )
         )
         conn.commit()
         flash('Cliente guardado exitosamente.', 'si')

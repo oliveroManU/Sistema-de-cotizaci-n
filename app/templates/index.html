@@ -25,18 +25,45 @@
         <p>Datos de contacto y facturación</p>
     </div>
 
+<!-- Registro de cliente -->
+
     <form action="{{ url_for('guardar_cliente') }}" method="POST">
         
-        <div class="app-form-grid">
+        <div class="">
             
-            <div class="app-form-field app-form-field--full">
+            
+
+             <div class="app-form-field app-form-field--full">
                 <label class="form-label" for="nombre-cliente">Nombre del cliente</label>
-                <input id="nombre-cliente" name="NAME_CLIENT" class="form-control" placeholder="Nombre y apellido" type="text" required>
+                <input id="nombre-cliente" name="nombre-cliente" class="form-control" placeholder="Nombre y apellido" 
+                type="text" oninput="pasarvalores()" required>
             </div>
-            
-            <div class="app-form-field app-form-field--full">
+
+            <div class="row contenedor-inputs">
+
+            <div class="">
+                <label class="form-label" for="direccion-cliente">RIF</label>
+                <input id="RIF" name="RIF" class="form-control" placeholder="23-000-0007"
+                type="text">
+            </div>
+
+            <div class="">
                 <label class="form-label" for="direccion-cliente">Dirección</label>
-                <input id="direccion-cliente" name="DELIVERY_LOCATION" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+                <input id="direccion-cliente" name="direccion-cliente" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+            </div>
+           
+            </div>
+
+            <div class="app-form-field app-form-field--full">
+                <label class="form-label" for="direccion-cliente">Email</label>
+                <input id="email" name="email" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+            </div>
+
+            <div class="app-form-field app-form-field--full">
+                <label class="form-label" for="direccion-cliente">Telefono</label>
+                <input id="telefono" name="telefono" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+            </div>
+
             </div>
 
             <div class="app-form-field app-form-field--full">
@@ -94,6 +121,8 @@
 
     <!-- Div de la tabla de cotizacion -->
 
+    <form action="{{ url_for('guardar_cliente') }}">
+
     <div class="table-responsive">
         
         <table class="table align-middle" id="tabla-productos">
@@ -127,6 +156,8 @@
                             {% endfor %}
                         </select>
                     </th>
+
+                    <input type="hidden" class="nombre-cliente-c" >
 
                     <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
                     value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
@@ -186,6 +217,10 @@
         <input type="text" id="monto-iva-bn" readonly placeholder="0,00" class="form-control">
     </div>
 </section>
+
+
+
+    </form>
 
 <!--
 

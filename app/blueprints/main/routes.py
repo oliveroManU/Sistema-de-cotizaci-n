@@ -500,6 +500,70 @@ def guardar_cliente():
 
     return redirect(url_for('home'))
 
+## Guardar cotizaciion a cliente
+
+@app.route('/guardar_cotizacion_clientes', methods=['POST'])
+def guardar_cotizacion_cliente():
+    cliente       = request.form.getlist('nombre-cliente-c')
+    productos     = request.form.getlist('producto[]')
+    precios_unid  = request.form.getlist('precioporunidad[]')
+    cantidades    = request.form.getlist('cantidad-producto[]')
+    precios       = request.form.getlist('precio-producto[]')
+    tasas         = request.form.getlist('tasapagohoy[]')
+    porcentajes   = request.form.getlist('porcentajecompraventa[]')
+    precios_venta = request.form.getlist('precio-venta[]')
+    valores_d     = request.form.getlist('ValorActualD[]')
+    ganancias     = request.form.getlist('gananciasobrecosto[]')
+    margenes      = request.form.getlist('margen-ganancia[]')
+    descuentos    = request.form.getlist('descuento[]')
+    pdescuentos   = request.form.getlist('pdescuento[]')
+    descuentos_bs = request.form.getlist('descuentobs[]')
+    descuentos_d  = request.form.getlist('descuentod[]')
+
+    conn = connect_db()
+    cur  = conn.cursor()
+
+    # 1) Cabecera (opcional): crear un pedido
+    cur.execute("INSERT INTO pedidos (fecha) VALUES (datetime('now'))")
+    pedido_id = cur.lastrowid
+
+    # 2) Recorrer todas las filas y guardar cada producto
+    for i in range(len(productos)):
+        # Ignorar filas sin producto seleccionado
+        if not productos[i] or productos[i] == '0':
+            continue
+
+        cur.execute("""
+            INSERT INTO detalle_pedido
+              (pedido_id, codigo_producto, cliente_nombre, precio_unitario, cantidad,
+               precio, tasa_pago, porcentaje_cv, precio_venta,
+               valor_d, ganancia_sobre_costo, margen_ganancia,
+               descuento, pdescuento, descuento_bs, descuento_d)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            pedido_id,
+            productos[i],
+            cliente,
+            precios_unid[i],
+            cantidades[i],
+            precios[i],
+            tasas[i],
+            porcentajes[i],
+            precios_venta[i],
+            valores_d[i],
+            ganancias[i],
+            margenes[i],
+            descuentos[i],
+            pdescuentos[i],
+            descuentos_bs[i],
+            descuentos_d[i],
+        ))
+
+    conn.commit()
+    conn.close()
+
+    return redirect(url_for('home'))
+
 # ─────────────────────────────────────────────
 # Esta es la función para imprimir pdfs
 # ─────────────────────────────────────────────

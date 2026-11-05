@@ -159,6 +159,8 @@ function calcularTotalGeneral() {
   
 }
 
+
+
 function pasarvalores() {
     document.getElementById('nombre-cliente-c') = document.getElementById('nombre-cliente')
 }

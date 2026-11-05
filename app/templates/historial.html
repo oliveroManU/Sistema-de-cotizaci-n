@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Historial de Cotizaciones{% endblock %}
+
+{% block content %}
+<section class="app-page-header mt-4 mb-4">
+    <div>
+        <span class="app-eyebrow">Administración</span>
+        <h1>Historial de Cotizaciones</h1>
+        <p>Consulta todas las cotizaciones registradas en el sistema.</p>
+    </div>
+</section>
+
+<section class="app-card">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Nº Pedido</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unit.</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in resultados %}
+                <tr>
+                    <td>#{{ row.pedido_id }}</td>
+                    <td>{{ row.fecha }}</td>
+                    <td>{{ row.cliente_nombre }}</td>
+                    <td>
+                        <!-- Si el nombre del producto viene de la BD, lo mostramos, si no, el ID -->
+                        {{ row.nombre_producto if row.nombre_producto else 'ID: ' ~ row.codigo_producto }}
+                    </td>
+                    <td>{{ row.cantidad }}</td>
+                    <td>${{ "%.2f"|format(row.precio_unitario) }}</td>
+                    <td><strong>${{ "%.2f"|format(row.precio) }}</strong></td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <em>No hay cotizaciones registradas aún.</em>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

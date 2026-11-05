@@ -500,9 +500,126 @@ def guardar_cliente():
 
     return redirect(url_for('home'))
 
-# ─────────────────────────────────────────────
-# Esta es la función para imprimir pdfs
-# ─────────────────────────────────────────────
+@app.route('/guardar_cotizacion_clientes', methods=['POST'])
+def guardar_cotizacion_clientes():
+    cliente = request.form.get('nombre-cliente-c', 'Cliente Sin Nombre') 
+    productos     = request.form.getlist('producto[]')
+    precios_unid  = request.form.getlist('precioporunidad[]')
+    cantidades    = request.form.getlist('cantidad-producto[]')
+    precios       = request.form.getlist('precio-producto[]')
+    tasas         = request.form.getlist('tasapagohoy[]')
+    porcentajes   = request.form.getlist('porcentajecompraventa[]')
+    precios_venta = request.form.getlist('precio-venta[]')
+    valores_d     = request.form.getlist('ValorActualD[]')
+    ganancias     = request.form.getlist('gananciasobrecosto[]')
+    margenes      = request.form.getlist('margen-ganancia[]')
+    descuentos    = request.form.getlist('descuento[]')
+    pdescuentos   = request.form.getlist('pdescuento[]')
+    descuentos_bs = request.form.getlist('descuentobs[]')
+    descuentos_d  = request.form.getlist('descuentod[]')
+
+    conn = connect_db()
+    cur  = conn.cursor()
+
+    # Función auxiliar para convertir a número de forma segura
+    def limpiar_numero(lista, index, es_entero=False):
+        try:
+            if index >= len(lista) or not lista[index].strip():
+                return 0 if es_entero else 0.0
+            # Reemplazamos comas por puntos para que float() no falle
+            valor = lista[index].replace(',', '.')
+            return int(float(valor)) if es_entero else float(valor)
+        except (ValueError, TypeError):
+            return 0 if es_entero else 0.0
+
+    try:
+        cur.execute("INSERT INTO pedidos (fecha) VALUES (datetime('now'))")
+        pedido_id = cur.lastrowid
+
+        pedido_id = cur.lastrowid
+
+        # AGREGA ESTA LÍNEA AQUÍ:
+        print(f"DEBUG: Recibí {len(productos)} productos. Datos: {productos}")
+
+
+        for i in range(len(productos)):
+            if not productos[i] or productos[i] == '' or productos[i].strip() == '':
+                continue
+
+            # Limpiamos y convertimos TODOS los datos
+            p_unitario = limpiar_numero(precios_unid, i)
+            cant       = limpiar_numero(cantidades, i, es_entero=True) # Forzamos entero
+            p_total    = limpiar_numero(precios, i)
+            tasa       = limpiar_numero(tasas, i)
+            porcentaje = limpiar_numero(porcentajes, i)
+            p_venta    = limpiar_numero(precios_venta, i)
+            v_dolar    = limpiar_numero(valores_d, i)
+            ganancia   = limpiar_numero(ganancias, i)
+            margen     = limpiar_numero(margenes, i)
+            desc       = limpiar_numero(descuentos, i)
+            p_desc     = limpiar_numero(pdescuentos, i)
+            desc_bs    = limpiar_numero(descuentos_bs, i)
+            desc_d     = limpiar_numero(descuentos_d, i)
+
+            cur.execute("""
+                INSERT INTO detalle_pedido
+                  (pedido_id, codigo_producto, cliente_nombre, precio_unitario, cantidad,
+                   precio, tasa_pago, porcentaje_cv, precio_venta,
+                   valor_d, ganancia_sobre_costo, margen_ganancia,
+                   descuento, pdescuento, descuento_bs, descuento_d)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                pedido_id, productos[i], cliente, 
+                p_unitario, cant, p_total, tasa, 
+                porcentaje, p_venta, v_dolar, ganancia, 
+                margen, desc, p_desc, desc_bs, desc_d
+            ))
+
+        conn.commit()
+        print("✅ ¡Cotización guardada con éxito!")
+        
+    except Exception as e:
+        conn.rollback()
+        # ESTO ES CLAVE: Si hay un error, te lo mostraremos en pantalla para que sepas por qué.
+        print(f"❌ ERROR CRÍTICO: {e}")
+        return f"Error al guardar los detalles: {e}", 500
+    finally:
+        conn.close()
+
+    return redirect(url_for('home'))
+
+@app.route('/historial_cotizaciones')
+def historial_cotizaciones():
+    conn = connect_db()
+    # ESTA LÍNEA ES LA MAGIA: Hace que los resultados sean diccionarios
+    conn.row_factory = sqlite3.Row 
+    cur = conn.cursor()
+
+    query = """
+        SELECT 
+            p.id AS pedido_id,
+            p.fecha,
+            d.cliente_nombre,
+            d.codigo_producto,
+            pr.nombre AS nombre_producto, 
+            d.cantidad,
+            d.precio_unitario,
+            d.precio,
+            d.descuento
+        FROM pedidos p
+        INNER JOIN detalle_pedido d ON p.id = d.pedido_id
+        LEFT JOIN productos pr ON d.codigo_producto = pr.id
+        ORDER BY p.fecha DESC
+    """
+    
+    cur.execute(query)
+    resultados = cur.fetchall()
+    conn.close()
+
+    return render_template('historial.html', resultados=resultados)
+
+# Función para imprimir pdfs
+
 @app.route('/descargar_pdf/<int:id>')
 @login_required
 def descargar_pdf(id):

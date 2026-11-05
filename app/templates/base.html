@@ -39,6 +39,9 @@
                         <li class="nav-item">
                             <a class="nav-link{% if request.endpoint == 'registros_cotizaciones' or request.endpoint == 'editar_producto' or request.endpoint == 'actualizar_producto' %} active{% endif %}" {% if request.endpoint == 'mostrador' or request.endpoint == 'editar_producto' or request.endpoint == 'actualizar_producto' %}aria-current="page"{% endif %} href="{{ url_for('registros_cotizaciones') }}">Registros</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link{% if request.endpoint == 'historial_cotizaciones' %} active{% endif %}" {% if request.endpoint == 'historial_cotizaciones' %}aria-current="page"{% endif %} href="{{ url_for('historial_cotizaciones') }}">Historial</a>
+                        </li>
                     </ul>
                     <span class="app-nav-tagline">Lubricantes y soluciones automotrices</span>
 

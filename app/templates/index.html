@@ -121,7 +121,9 @@
 
     <!-- Div de la tabla de cotizacion -->
 
-    <form action="{{ url_for('guardar_cliente') }}">
+    <form action="{{ url_for('guardar_cotizacion_clientes') }}" method="POST">
+
+    <input type="hidden" name="nombre-cliente-c" class="nombre-cliente-c" value="Cliente Prueba">
 
     <div class="table-responsive">
         
@@ -149,48 +151,53 @@
                 <tr>
 
                     <th scope="row">
-                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
-                            <option value="0" disabled selected>Seleccionar producto</option>
+                        <select class="form-select" name="producto[]" aria-label="Seleccionar producto">
+                            <option value="" disabled selected>Seleccionar producto</option>
                             {% for product in productos %}
-                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
+                                <option value="{{ product.id }}" >{{ product.NOMBRE }}</option>
                             {% endfor %}
                         </select>
                     </th>
 
-                    <input type="hidden" class="nombre-cliente-c" >
+                    
+            
+        
 
-                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
-                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
+                    <td><input type="text" class="precioporunidad" name="precioporunidad[]" id="precioporunidad" 
                     required oninput="multiplicacion(this)"></td>
                     
-                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
+                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto[]" id="cantidad-producto"
                     required oninput="multiplicacion(this)"></td>
                     
-                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
+                    <td><input class="precio-producto form-control" type="text" name="precio-producto[]" id="precio-producto"
+                    required oninput="multiplicacion(this)"></td>
+                    
+                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy[]" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
                     value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
                     
-                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
+                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa[]" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
                     required oninput="multiplicacion(this)"> </td>
 
-                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
+                    <td><input type="text" class="form-control precio-venta" name="precio-venta[]" id="precio-venta" aria-label="Amount (to the nearest dollar)"
+                    required oninput="multiplicacion(this)"></td>
 
-                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
+                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD[]" id="ValorActualD" readonly></td>
 
-                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
+                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto[]" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
 
-                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
+                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia[]" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
                     readonly></td>
 
-                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
-                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
+                    <td>
+            <input type="text" class="form-control descuento" name="descuento[]" oninput="multiplicacion(this)">
+            <!-- Corregido: etiqueta en minúsculas, sin cierre, con corchetes en el name y con value por defecto -->
+            <input type="hidden" class="pdescuento" name="pdescuento[]" value="0">
+        </td>
                     <td>
                         <div class="contenedor-inputs">
-                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
+                        <input type="text" class="form-control descuentobs" name="descuentobs[]" id="descuentobs" aria-label="Amount (to the nearest dollar)"
                         readonly>
-                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
+                        <input type="text" class="form-control descuentod" name="descuentod[]" id="descuentod" aria-label="Amount (to the nearest dollar)"
                         readonly>
                         </div>
                     </td>
@@ -208,6 +215,7 @@
     <div class="app-quote-actions">
         <button type="button" class="btn btn-primary" onclick="insertarProducto()">Agregar producto</button>
         <button type="button" class="btn btn-outline-danger" onclick="eliminarTodos()">Limpiar productos</button>
+        <button type="submit" class="btn btn-outline-danger">Registrar</button>
     </div>
 
     <div class="app-quote-total">
@@ -216,11 +224,12 @@
         <label for="total-general"><strong>+ IVA</strong></label>
         <input type="text" id="monto-iva-bn" readonly placeholder="0,00" class="form-control">
     </div>
+    </form>
 </section>
 
 
 
-    </form>
+    
 
 <!--
 
@@ -242,129 +251,58 @@
 {% block scripts %}
 <script>
 
-// Funcion de Boton para insertar producto en la tabla
-
 function insertarProducto() {
     const cuerpoTabla = document.getElementById('cuerpo-tabla');
-    const nuevaFila = document.createElement('tr');
-
-    nuevaFila.innerHTML = `
-        
-                        <tr>
-
-                    <th scope="row">
-                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
-                            <option value="0" disabled selected>Seleccionar producto</option>
-                            {% for product in productos %}
-                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
-                            {% endfor %}
-                        </select>
-                    </th>
-
-                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
-                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
-                    required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
-                    required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
-                    value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
-                    
-                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
-                    required oninput="multiplicacion(this)"> </td>
-
-                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
-
-                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
-
-                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
-
-                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
-                    readonly></td>
-
-                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
-                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
-
-                    <td>
-                        <div class="contenedor-inputs">
-                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
-                        readonly>
-                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
-                        readonly>
-                        </div>
-                    </td>
-
-                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
-                    
-                </tr>
-    `;
+    // Tomamos la primera fila (que ya tiene los productos cargados por Jinja)
+    const filaOriginal = cuerpoTabla.querySelector('tr');
+    
+    // La clonamos
+    const nuevaFila = filaOriginal.cloneNode(true);
+    
+    // Limpiamos los valores de los inputs para que el usuario los llene
+    nuevaFila.querySelectorAll('input').forEach(input => {
+        if (input.type !== 'hidden') {
+            input.value = '';
+        }
+    });
+    
+    // Reseteamos el select a la primera opción
+    nuevaFila.querySelector('select').selectedIndex = 0;
+    
+    // Agregamos la nueva fila
     cuerpoTabla.appendChild(nuevaFila);
 }
 
-// Funcion de Boton de reseteo de productos
-
 function eliminarTodos() {
     const cuerpoTabla = document.getElementById('cuerpo-tabla');
-
     if (confirm('¿Estás seguro de que deseas eliminar todos los productos?')) {
-        cuerpoTabla.innerHTML = `
-            <tr>
+        // En lugar de escribir HTML a mano, dejamos solo la primera fila y la limpiamos
+        const filaOriginal = cuerpoTabla.querySelector('tr');
+        cuerpoTabla.innerHTML = '';
+        cuerpoTabla.appendChild(filaOriginal);
+        
+        filaOriginal.querySelectorAll('input').forEach(input => {
+            if (input.type !== 'hidden') {
+                input.value = '';
+            }
+        });
+        filaOriginal.querySelector('select').selectedIndex = 0;
+        
+        if (typeof calcularTotalGeneral === 'function') {
+            calcularTotalGeneral();
+        }
+    }
+}
 
-                    <th scope="row">
-                        <select class="form-select" name="producto" id="producto" aria-label="Seleccionar producto">
-                            <option value="0" disabled selected>Seleccionar producto</option>
-                            {% for product in productos %}
-                                <option value="{{ product.CODIGO }}" id="producto">{{ product.NOMBRE }}</option>
-                            {% endfor %}
-                        </select>
-                    </th>
-
-                    <td><input type="text" class="precioporunidad" name="precioporunidad" id="precioporunidad" 
-                    value="{{productos['precioporunidad']}}" required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto" id="cantidad-producto"
-                    required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="precio-producto form-control" type="text" name="precio-producto" id="precio-producto"
-                    required oninput="multiplicacion(this)"></td>
-                    
-                    <td><input class="tasapagohoy form-control" type="text" name="tasapagohoy" id="tasapagohoy" aria-label="Amount (to the nearest dollar)"
-                    value="{{ '%.2f'|format(tasa_bcv_dolar) if tasa_bcv_dolar else '' }}" readonly></td>
-                    
-                    <td><input type="text" class="form-control porcentajeCV" name="porcentajecompraventa" id="porcentajecompraventa" aria-label="Amount (to the nearest dollar)"
-                    required oninput="multiplicacion(this)"> </td>
-
-                    <td><input type="text" class="form-control precio-venta" name="precio-venta" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-                    value="{{productos['precio_venta']}}" required oninput="multiplicacion(this)"></td>
-
-                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD" id="ValorActualD" readonly></td>
-
-                    <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
-
-                    <td> <input type="text" class="form-control margen-ganancia" name="margen-ganancia" id="margen-ganancia" aria-label="Amount (to the nearest dollar)"
-                    readonly></td>
-
-                    <td><input type="text" class="form-control descuento" name="descuento" id="descuento" aria-label="Amount (to the nearest dollar)" oninput="multiplicacion(this)"></td>
-                        <INput type="hidden" class="pdescuento" id="pdescuento" name="pdescuento" ></INput>
-
-                    <td>
-                        <div class="contenedor-inputs">
-                        <input type="text" class="form-control descuentobs" name="descuentobs" id="descuentobs" aria-label="Amount (to the nearest dollar)"
-                        readonly>
-                        <input type="text" class="form-control descuentod" name="descuentod" id="descuentod" aria-label="Amount (to the nearest dollar)"
-                        readonly>
-                        </div>
-                    </td>
-
-                    <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
-                    
-                </tr>
-        `;
-        calcularTotalGeneral();
+function eliminarFila(boton) {
+    const fila = boton.closest('tr');
+    const cuerpoTabla = document.getElementById('cuerpo-tabla');
+    
+    // Solo eliminamos si hay más de una fila
+    if (cuerpoTabla.querySelectorAll('tr').length > 1) {
+        fila.remove();
+    } else {
+        alert('Debe haber al menos una fila de producto.');
     }
 }
 </script>

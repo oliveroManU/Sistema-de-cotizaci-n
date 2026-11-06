@@ -7,47 +7,122 @@
     <div>
         <span class="app-eyebrow">Administración</span>
         <h1>Historial de Cotizaciones</h1>
-        <p>Consulta todas las cotizaciones registradas en el sistema.</p>
+        <p>Consulta todas las cotizaciones registradas y el detalle de sus productos.</p>
     </div>
 </section>
 
-<section class="app-card">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle">
-            <thead class="table-dark">
-                <tr>
-                    <th>Nº Pedido</th>
-                    <th>Fecha</th>
-                    <th>Cliente</th>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio Unit.</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
+<section class="app-card mt-4 mb-5">
+    
+    {% for pedido in pedidos %}
+    <div class="card mb-4 shadow-sm border-0">
+        
+        <!-- CABECERA DEL PEDIDO -->
+        <div class="card-header bg-light border-bottom-0 py-3 d-flex justify-content-between align-items-center" 
+             data-bs-toggle="collapse" 
+             data-bs-target="#detalle-{{ pedido.id }}" 
+             aria-expanded="false" 
+             style="cursor: pointer;">
+            
+            <div>
+                <h5 class="mb-1 fw-bold text-dark">Pedido #{{ pedido.id }}</h5>
+                <span class="text-muted small me-3">{{ pedido.fecha }}</span>
+                <span class="badge bg-secondary text-dark bg-opacity-25">Cliente: {{ pedido.cliente | default('Sin Nombre', true) }}</span>
+            </div>
+            
+            <div class="text-end">
+                <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Total con IVA</small>
+                <span class="fs-5 fw-bold text-success">
+                    Bs {{ ((pedido.subtotal_descuento | default(0) | float) + (pedido.total_iva | default(0) | float)) | round(2) }}
+                </span>
+            </div>
+        </div>
+
+        <!-- DETALLE DEL PEDIDO (Colapsable) -->
+        <div class="collapse" id="detalle-{{ pedido.id }}">
+            
+            <!-- Tabla de Productos -->
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0 text-center">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unit.</th>
+                            <th>Precio</th>
+                            <th>Tasa</th>
+                            <th>% Ganancia</th>
+                            <th>Precio Venta</th>
+                            <th>Valor $</th>
+                            <th>Ganancia Costo</th>
+                            <th>% Descuento</th>
+                            <th>Descuento Bs.</th>
+                            <th>Descuento $</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prod in pedido.productos %}
+                        <tr>
+                            <td class="fw-bold">{{ prod[0] }}</td>
+                            <td>{{ prod[1] }}</td>
+                            <td>Bs {{ prod[2] }}</td>
+                            <td>Bs {{ prod[3] }}</td>
+                            <td>Bs {{ prod[4] }}</td>
+                            <td>{{ prod[5] }}%</td>
+                            <td>Bs {{ prod[6] }}</td>
+                            <td>$ {{ prod[7] }}</td>
+                            <td>Bs {{ prod[8] }}</td>
+                            <td>{{ prod[9] }}%</td>
+                            <td>Bs {{ prod[10] }}</td>
+                            <td>$ {{ prod[11] }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="12" class="text-center text-muted py-3">No hay productos registrados en este pedido.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+<!-- Resumen de Totales (Estilo Limpio) -->
+<div class="d-flex justify-content-end p-4 bg-white border-top">
+    <div class="table-responsive rounded-3 overflow-hidden border" style="min-width: 400px;">
+        <table class="table table-sm align-middle mb-0">
             <tbody>
-                {% for row in resultados %}
                 <tr>
-                    <td>#{{ row.pedido_id }}</td>
-                    <td>{{ row.fecha }}</td>
-                    <td>{{ row.cliente_nombre }}</td>
-                    <td>
-                        <!-- Si el nombre del producto viene de la BD, lo mostramos, si no, el ID -->
-                        {{ row.nombre_producto if row.nombre_producto else 'ID: ' ~ row.codigo_producto }}
-                    </td>
-                    <td>{{ row.cantidad }}</td>
-                    <td>${{ "%.2f"|format(row.precio_unitario) }}</td>
-                    <td><strong>${{ "%.2f"|format(row.precio) }}</strong></td>
+                    <td class="bg-light text-muted fw-bold border-bottom-0" style="width: 50%;">Tasa aplicada:</td>
+                    <td class="text-end border-bottom-0">Bs {{ pedido.tasa | default('0.00', true) }}</td>
                 </tr>
-                {% else %}
                 <tr>
-                    <td colspan="7" class="text-center py-4">
-                        <em>No hay cotizaciones registradas aún.</em>
+                    <td class="bg-light text-muted fw-bold border-bottom-0">Subtotal (Bs):</td>
+                    <td class="text-end border-bottom-0">{{ pedido.subtotal | default('0.00', true) }}</td>
+                </tr>
+                <tr>
+                    <td class="bg-light text-muted fw-bold border-bottom-0">Subtotal ($):</td>
+                    <td class="text-end border-bottom-0">$ {{ pedido.subtotal_d | default('0.00', true) }}</td>
+                </tr>
+                <tr>
+                    <td class="bg-light text-muted fw-bold border-bottom-0">IVA (16%):</td>
+                    <td class="text-end border-bottom-0">{{ pedido.total_iva | default('0.00', true) }}</td>
+                </tr>
+                <tr class="table-dark border-0">
+                    <td class="fw-bold fs-5 border-0 py-3">Total Pedido:</td>
+                    <td class="text-end fw-bold fs-5 text-success border-0 py-3">
+                        Bs {{ ((pedido.subtotal_descuento | default(0) | float) + (pedido.total_iva | default(0) | float)) | round(2) }}
                     </td>
                 </tr>
-                {% endfor %}
             </tbody>
         </table>
     </div>
+</div>
+            
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info text-center shadow-sm">
+        No hay cotizaciones registradas en el sistema.
+    </div>
+    {% endfor %}
+
 </section>
 {% endblock %}

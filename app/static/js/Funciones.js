@@ -109,15 +109,6 @@ function multiplicacion(elemento) {
         fila.querySelector('.descuentod').value = PrecioMasDescuentoDolar.toFixed(2);
     }   
 
-    /// const PrecioDolares = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProducto) : 0;
-    /// const total = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProducto)) : 0;
-    /// const PorcentajeDevaluacion = ((TasaPagoProductoHoy - TasaPagoProducto)/TasaPagoProducto)*100
-
-   
-    /// fila.querySelector('.preciod').value = PrecioDolares.toFixed(2);
-    /// fila.querySelector('.gananciaD').value = total.toFixed(4);
-    /// fila.querySelector('.porcentajedevaluacion').value = PorcentajeDevaluacion.toFixed(2);
-       
 
     calcularTotalGeneral();
 }
@@ -146,7 +137,10 @@ function calcularTotalGeneral() {
         inputTotalGeneral.value = totalGeneral.toFixed(2);
     }
 
+    
+
     const subtotal = totalGeneral; 
+    
     const PorcentajeIVA = 16;
     const MontoIVA = subtotal * (PorcentajeIVA / 100);
     const MontoConIVA = subtotal + MontoIVA;
@@ -155,14 +149,30 @@ function calcularTotalGeneral() {
     if (inputMontoIvaBn) {
         inputMontoIvaBn.value = MontoConIVA.toFixed(2); 
     }
+
+    const tasapago = document.getElementById('tasapagohoy') || 0;
+    const subtotald = tasapago !== 0 ? (subtotal / tasapago) : 0;
     
+    // 3. Actualizar el input de Subtotal $ (Usando getElementById en lugar de fila.querySelector)
+    const inputTotalGeneralD = document.getElementById('total-generald');
+    if (inputTotalGeneralD) {
+        inputTotalGeneralD.value = subtotald.toFixed(2);
+    }    
+
+
+
   
 }
 
 
 
 function pasarvalores() {
-    document.getElementById('nombre-cliente-c') = document.getElementById('nombre-cliente')
+    const nombre = document.getElementById('nombre-cliente').value.trim();
+    document.getElementById('nombre-cliente-a').value = nombre;
+    document.getElementById('nombre-cliente-c').value = nombre;
+
+    const tasa = document.querySelector('.tasapagohoy');
+    if (tasa) document.getElementById('tasapagob').value = tasa.value;
 }
 // ===============================
 // BANCO CENTRAL DE VENEZUELA

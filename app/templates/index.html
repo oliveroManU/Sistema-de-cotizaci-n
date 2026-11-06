@@ -123,7 +123,7 @@
 
     <form action="{{ url_for('guardar_cotizacion_clientes') }}" method="POST">
 
-    <input type="hidden" name="nombre-cliente-c" class="nombre-cliente-c" value="Cliente Prueba">
+    <input type="hidden" name="nombre-cliente-c" class="nombre-cliente-c" id="nombre-cliente-c">
 
     <div class="table-responsive">
         
@@ -210,6 +210,8 @@
     </div>
     <p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para ver todas las columnas.</p>
 
+
+
     <!-- Botones de Agregar producto y eliminar productos-->
 
     <div class="app-quote-actions">
@@ -219,10 +221,14 @@
     </div>
 
     <div class="app-quote-total">
-        <label for="total-general"><strong>Total general</strong></label>
-        <input type="text" id="total-general" readonly placeholder="0,00" class="form-control">
+        <input type="hidden" class="nombre-cliente-a" name="nombre-cliente-a" id="nombre-cliente-a">
+        <input type="hidden" class="tasapagob" name="tasapagob" id="tasapagob"> 
+
+        <label for="total-general"><strong>Subtotal</strong></label>
+        <input type="text" id="total-general" name="total-general" readonly placeholder="0,00" class="form-control">
+        <input type="text" id="total-generald" name="total-generald" readonly placeholder="0,00" class="form-control">
         <label for="total-general"><strong>+ IVA</strong></label>
-        <input type="text" id="monto-iva-bn" readonly placeholder="0,00" class="form-control">
+        <input type="text" id="monto-iva-bn" name="monto-iva-bn" readonly placeholder="0,00" class="form-control">
     </div>
     </form>
 </section>
@@ -261,11 +267,16 @@ function insertarProducto() {
     
     // Limpiamos los valores de los inputs para que el usuario los llene
     nuevaFila.querySelectorAll('input').forEach(input => {
-        if (input.type !== 'hidden') {
+        // No limpiamos los hidden (como el pdescuento que debe ser 0)
+        if (input.type !== 'hidden' && !input.classList.contains('tasapagohoy')) {
             input.value = '';
         }
     });
     
+    // 2. Forzamos a que la nueva fila tenga la misma tasa de pago que la primera fila
+    const tasaOriginal = filaOriginal.querySelector('.tasapagohoy').value;
+    
+    nuevaFila.querySelector('.tasapagohoy').value = tasaOriginal;
     // Reseteamos el select a la primera opción
     nuevaFila.querySelector('select').selectedIndex = 0;
     

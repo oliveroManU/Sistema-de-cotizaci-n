@@ -675,3 +675,52 @@ def descargar_pdf(id):
     response.headers['Content-Type'] = 'application/pdf'
     response.headers['Content-Disposition'] = f'inline; filename=cotizacion_{id}.pdf'
     return response
+
+@app.route('/descargar_pdf2/<int:id>')
+@login_required
+def descargar_pdf2(id):
+    conn = connect_db()
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    # 1. Buscar la cabecera del pedido
+    pedido = cur.execute('SELECT * FROM pedidos WHERE id = ?', (id,)).fetchone()
+    
+    if not pedido:
+        conn.close()
+        flash('Cotización no encontrada.', 'error')
+        return redirect(url_for('historial_cotizaciones'))
+
+    # 2. Buscar los productos de ese pedido
+    productos = cur.execute('SELECT * FROM detalle_pedido WHERE pedido_id = ?', (id,)).fetchall()
+    
+    conn.close()
+
+    # 3. Renderizar la plantilla pasando el pedido y sus productos
+    html = render_template('pdf_cotizacion2.html', pedido=pedido, productos=productos)
+
+    # 4. Opciones del PDF (puedes dejarlas igual)
+    options = {
+        'page-size': 'A4',
+        'margin-top': '0.75in',
+        'margin-right': '0.75in',
+        'margin-bottom': '0.75in',
+        'margin-left': '0.75in',
+        'encoding': "UTF-8",
+        'no-outline': None,
+        'enable-local-file-access': None # <-- IMPORTANTE: Añade esto si usas imágenes o CSS locales
+    }
+
+    try:
+        # Generar el PDF en memoria
+        pdf = pdfkit.from_string(html, False, options=options)
+    except Exception as e:
+        # Si wkhtmltopdf no está instalado o falla, lanzará un error
+        flash(f'Error al generar PDF: {e}', 'error')
+        return redirect(url_for('historial_cotizaciones'))
+
+    # 5. Devolver el PDF (inline lo abre en el navegador, attachment lo descarga)
+    response = make_response(pdf)
+    response.headers['Content-Type'] = 'application/pdf'
+    response.headers['Content-Disposition'] = f'inline; filename=pedido_{id}.pdf'
+    return response

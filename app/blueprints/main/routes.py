@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import requests
+import json
 from functools import wraps
 import pdfkit
 import urllib3
@@ -9,7 +10,17 @@ from PIL import Image
 from flask import render_template, request, redirect, url_for, flash, make_response, current_app
 from flask_login import UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 from . import app, login_manager
+
+def SaveglobalHistory(conn, user_action, action, opdetails):
+    currentdate = datetime.datetime.now().astimezone().isoformat(timespec='seconds')
+    details = json.dumps(opdetails, ensure_ascii=False, sort_keys=True)
+    conn.execute(
+        'INSERT INTO GLOBAL_HISTORY (USER_ACTION, ACTION, DATE_HOUR, OPERATION_DETAILS) '
+        'VALUES (?, ?, ?, ?)',
+        (user_action, action, currentdate, details)
+    )
 
 urllib3.disable_warnings()
 UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'static', 'img', 'productos')
@@ -93,6 +104,7 @@ def obtener_tasa_bcv(moneda="euro"):
 # HOME
 
 @app.route('/')
+@login_required
 def home():
     conn = connect_db()
     conn.row_factory = sqlite3.Row
@@ -102,6 +114,8 @@ def home():
     
     conn.close()
     return render_template('index.html', productos=productos, clientes=clientes, tasa_bcv_dolar=tasa_bcv_dolar)
+
+
 
 # ─────────────────────────────────────────────
 # LOGIN / LOGOUT
@@ -154,6 +168,8 @@ def logout():
 # ─────────────────────────────────────────────
 # ADMIN: Apartado de administración de usuarios
 # ─────────────────────────────────────────────
+
+
 @app.route('/admin/usuarios')
 @admin_required
 def admin_usuarios():
@@ -185,14 +201,24 @@ def admin_crear_usuario():
 
     conn = connect_db()
     try:
-        conn.execute(
+        cursor = conn.execute(
             'INSERT INTO usuarios (nombre, email, password_hash, nivel, activo) VALUES (?, ?, ?, ?, 1)',
             (nombre, email, generate_password_hash(password), nivel)
+        )
+        SaveglobalHistory(
+            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            'Crear usuario',
+            {'usuario_id': cursor.lastrowid, 'nombre': nombre, 'email': email, 'nivel': nivel}
         )
         conn.commit()
         flash(f'Usuario {nombre} creado como {nivel}.', 'si')
     except sqlite3.IntegrityError:
+        conn.rollback()
         flash('Ese correo ya existe.', 'no')
+    except sqlite3.Error:
+        conn.rollback()
+        current_app.logger.exception('Error al crear usuario y registrar el historial.')
+        flash('No se pudo crear el usuario.', 'no')
     finally:
         conn.close()
 
@@ -208,10 +234,31 @@ def admin_toggle_usuario(user_id):
         return redirect(url_for('admin_usuarios'))
 
     conn = connect_db()
-    conn.execute('UPDATE usuarios SET activo = 1 - activo WHERE id = ?', (user_id,))
-    conn.commit()
-    conn.close()
-    flash('Estado del usuario actualizado.', 'si')
+    try:
+        conn.row_factory = sqlite3.Row
+        usuario = conn.execute(
+            'SELECT id, nombre, email, nivel, activo FROM usuarios WHERE id = ?', (user_id,)
+        ).fetchone()
+        if usuario is None:
+            flash('Usuario no encontrado.', 'no')
+            return redirect(url_for('admin_usuarios'))
+
+        nuevo_estado = 1 - usuario['activo']
+        conn.execute('UPDATE usuarios SET activo = ? WHERE id = ?', (nuevo_estado, user_id))
+        SaveglobalHistory(
+            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            'Activar usuario' if nuevo_estado else 'Desactivar usuario',
+            {'usuario_id': user_id, 'nombre': usuario['nombre'], 'email': usuario['email']}
+        )
+        conn.commit()
+        flash('Estado del usuario actualizado.', 'si')
+    except sqlite3.Error:
+        conn.rollback()
+        current_app.logger.exception('Error al cambiar el estado del usuario y registrar el historial.')
+        flash('No se pudo actualizar el estado del usuario.', 'no')
+    finally:
+        conn.close()
+    
     return redirect(url_for('admin_usuarios'))
 
 # Restablecer contraseña de un usuario
@@ -225,13 +272,32 @@ def admin_reset_password(user_id):
         return redirect(url_for('admin_usuarios'))
 
     conn = connect_db()
-    conn.execute(
-        'UPDATE usuarios SET password_hash = ? WHERE id = ?',
-        (generate_password_hash(nueva), user_id)
-    )
-    conn.commit()
-    conn.close()
-    flash('Contraseña actualizada.', 'si')
+    try:
+        conn.row_factory = sqlite3.Row
+        usuario = conn.execute(
+            'SELECT id, nombre, email FROM usuarios WHERE id = ?', (user_id,)
+        ).fetchone()
+        if usuario is None:
+            flash('Usuario no encontrado.', 'no')
+            return redirect(url_for('admin_usuarios'))
+
+        conn.execute(
+            'UPDATE usuarios SET password_hash = ? WHERE id = ?',
+            (generate_password_hash(nueva), user_id)
+        )
+        SaveglobalHistory(
+            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            'Restablecer contraseña de usuario',
+            {'usuario_id': user_id, 'nombre': usuario['nombre'], 'email': usuario['email']}
+        )
+        conn.commit()
+        flash('Contraseña actualizada.', 'si')
+    except sqlite3.Error:
+        conn.rollback()
+        current_app.logger.exception('Error al restablecer contraseña y registrar el historial.')
+        flash('No se pudo actualizar la contraseña.', 'no')
+    finally:
+        conn.close()
     return redirect(url_for('admin_usuarios'))
 
 # Eliminar usuario
@@ -244,11 +310,32 @@ def admin_eliminar_usuario(user_id):
         return redirect(url_for('admin_usuarios'))
 
     conn = connect_db()
-    conn.execute('DELETE FROM usuarios WHERE id = ?', (user_id,))
-    conn.commit()
-    conn.close()
-    flash('Usuario eliminado.', 'si')
+    try:
+        conn.row_factory = sqlite3.Row
+        usuario = conn.execute(
+            'SELECT id, nombre, email, nivel FROM usuarios WHERE id = ?', (user_id,)
+        ).fetchone()
+        if usuario is None:
+            flash('Usuario no encontrado.', 'no')
+            return redirect(url_for('admin_usuarios'))
+
+        conn.execute('DELETE FROM usuarios WHERE id = ?', (user_id,))
+        SaveglobalHistory(
+            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            'Eliminar usuario',
+            {'usuario_id': user_id, 'nombre': usuario['nombre'],
+             'email': usuario['email'], 'nivel': usuario['nivel']}
+        )
+        conn.commit()
+        flash('Usuario eliminado.', 'si')
+    except sqlite3.Error:
+        conn.rollback()
+        current_app.logger.exception('Error al eliminar usuario y registrar el historial.')
+        flash('No se pudo eliminar el usuario.', 'no')
+    finally:
+        conn.close()
     return redirect(url_for('admin_usuarios'))
+
 
 # ─────────────────────────────────────────────
 # MOSTRADOR
@@ -352,17 +439,28 @@ def cotizacion_int():
             gananciaD    = float(request.form.get('gananciaD', 0) or 0)
             gananciaBs   = float(request.form.get('gananciaBs', 0) or 0)
 
-            conn.execute(
+            cursor = conn.execute(
                 'INSERT INTO productos (nombre, marca, precio, cantidad, precioporunidad, '
                 'moneda, tasapago, precioD, precio_venta, ganancia_estimadaD, ganancia_estimadaBs) '
                 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 (nombre, marca, precio, cantidad, preciounidad, moneda, tasapago,
                  preciod, precioventa, gananciaD, gananciaBs)
             )
+            SaveglobalHistory(
+                conn, f'{current_user.nombre} (ID: {current_user.id})',
+                'Crear producto',
+                {'producto_id': cursor.lastrowid, 'nombre': nombre, 'precio': precio,
+                 'cantidad': cantidad, 'precio_venta': precioventa}
+            )
             conn.commit()
             flash('Producto registrado.', 'si')
         except (ValueError, TypeError) as e:
+            conn.rollback()
             flash(f'Error en los datos: {e}', 'no')
+        except sqlite3.Error:
+            conn.rollback()
+            current_app.logger.exception('Error al crear producto.')
+            flash('No se pudo registrar el producto.', 'no')
 
     productos = conn.execute("SELECT * FROM productos").fetchall()
     conn.close()
@@ -426,29 +524,73 @@ def actualizar_productos1(productos_id):
         porcentaje         = float(request.form.get('porcentajecompraventa', 0) or 0)
 
         conn = connect_db()
-        conn.execute(
-            'UPDATE productos SET precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, '
-            'precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? '
-            'WHERE id = ?',
-            (precio, cantidad, preciounidad, tasapago, preciod, precioventa,
-             gananciaD, gananciaBs, productos_id)
-        )
+        try:
+            conn.row_factory = sqlite3.Row
+            anterior = conn.execute(
+                'SELECT precio, cantidad, precioporunidad, tasapago, precioD, precio_venta, '
+                'ganancia_estimadaD, ganancia_estimadaBs FROM productos WHERE id = ?',
+                (productos_id,)
+            ).fetchone()
+            if anterior is None:
+                flash('Producto no encontrado.', 'no')
+                return redirect(url_for('registros_cotizaciones'))
 
-        conn.execute('''
-            INSERT INTO reg_cotizaciones (
-                producto_id, nombre_producto, marca_producto, precio_unitario, cantidad,
-                precio_total, tasa_bcv, porcentaje_ganancia, precio_venta, ganancia_bs,
-                ganancia_usd, ganancia_sobre_costo, margen_ganancia, monto_iva,
-                precio_con_iva, monto_iva_usd
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (
-            productos_id, nombre_producto, marca_producto, preciounidad, cantidad,
-            precio, tasa_hoy, porcentaje, precioventa, gananciaBs, gananciaD,
-            gananciasobrecosto, margen_ganancia, monto_iva, precio_con_iva, monto_iva_d
-        ))
+            conn.execute(
+                'UPDATE productos SET precio = ?, cantidad = ?, precioporunidad = ?, tasapago = ?, '
+                'precioD = ?, precio_venta = ?, ganancia_estimadaD = ?, ganancia_estimadaBs = ? '
+                'WHERE id = ?',
+                (precio, cantidad, preciounidad, tasapago, preciod, precioventa,
+                 gananciaD, gananciaBs, productos_id)
+            )
 
-        conn.commit()
-        conn.close()
+            conn.execute('''
+                INSERT INTO reg_cotizaciones (
+                    producto_id, nombre_producto, marca_producto, precio_unitario, cantidad,
+                    precio_total, tasa_bcv, porcentaje_ganancia, precio_venta, ganancia_bs,
+                    ganancia_usd, ganancia_sobre_costo, margen_ganancia, monto_iva,
+                    precio_con_iva, monto_iva_usd
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (
+                productos_id, nombre_producto, marca_producto, preciounidad, cantidad,
+                precio, tasa_hoy, porcentaje, precioventa, gananciaBs, gananciaD,
+                gananciasobrecosto, margen_ganancia, monto_iva, precio_con_iva, monto_iva_d
+            ))
+            cotizacion_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
+
+            SaveglobalHistory(
+                conn, f'{current_user.nombre} (ID: {current_user.id})',
+                'Editar producto',
+                {
+                    'producto_id': productos_id,
+                    'antes': dict(anterior),
+                    'despues': {
+                        'precio': precio, 'cantidad': cantidad,
+                        'precioporunidad': preciounidad, 'tasapago': tasapago,
+                        'precioD': preciod, 'precio_venta': precioventa,
+                        'ganancia_estimadaD': gananciaD, 'ganancia_estimadaBs': gananciaBs
+                    }
+                }
+            )
+            SaveglobalHistory(
+                conn, f'{current_user.nombre} (ID: {current_user.id})',
+                'Registrar cotización',
+                {
+                    'cotizacion_id': cotizacion_id,
+                    'producto_id': productos_id,
+                    'nombre': nombre_producto,
+                    'precio': precio,
+                    'cantidad': cantidad,
+                    'precio_venta': precioventa
+                }
+            )
+            conn.commit()
+        except sqlite3.Error:
+            conn.rollback()
+            current_app.logger.exception('Error al editar producto y registrar la cotización.')
+            flash('No se pudo guardar el producto y la cotización.', 'no')
+            return redirect(url_for('editar_productos1', productos_id=productos_id))
+        finally:
+            conn.close()
 
         flash('Producto y cotización guardados correctamente.', 'si')
         return redirect(url_for('mostrador'))
@@ -462,9 +604,27 @@ def actualizar_productos1(productos_id):
 @login_required
 def eliminar_producto1(productos_id):
     conn = connect_db()
-    conn.execute("DELETE FROM productos WHERE id = ?", (productos_id,))
-    conn.commit()
-    conn.close()
+    try:
+        conn.row_factory = sqlite3.Row
+        producto = conn.execute('SELECT * FROM productos WHERE id = ?', (productos_id,)).fetchone()
+        if producto is None:
+            flash('Producto no encontrado.', 'no')
+            return redirect(url_for('registros_cotizaciones'))
+
+        conn.execute("DELETE FROM productos WHERE id = ?", (productos_id,))
+        SaveglobalHistory(
+            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            'Eliminar producto',
+            {'producto_id': productos_id, 'datos': dict(producto)}
+        )
+        conn.commit()
+    except sqlite3.Error:
+        conn.rollback()
+        current_app.logger.exception('Error al eliminar producto y registrar el historial.')
+        flash('No se pudo eliminar el producto.', 'no')
+        return redirect(url_for('registros_cotizaciones'))
+    finally:
+        conn.close()
 
     flash('Producto eliminado.', 'si')
     return redirect(url_for('registros_cotizaciones'))
@@ -487,14 +647,21 @@ def guardar_cliente():
 
     conn = connect_db()
     try:
-        conn.execute(
+        cursor = conn.execute(
             'INSERT INTO clientes (nombre, RIF, direccion, email, telefono) VALUES (?, ?, ?, ?, ?)',
             (nombre, rif, direccion, email, telefono )
         )
+        SaveglobalHistory(
+            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            'Crear cliente',
+            {'cliente_id': cursor.lastrowid, 'nombre': nombre}
+        )
         conn.commit()
         flash('Cliente guardado exitosamente.', 'si')
-    except Exception as e:
-        flash(f'Error al registrar el cliente: {e}', 'no')
+    except sqlite3.Error:
+        conn.rollback()
+        current_app.logger.exception('Error al registrar cliente y guardar el historial.')
+        flash('No se pudo registrar el cliente.', 'no')
     finally:
         conn.close()
 

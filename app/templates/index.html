@@ -27,11 +27,9 @@
 
 <!-- Registro de cliente -->
 
-    <form action="{{ url_for('guardar_cliente') }}" method="POST">
+<form action="{{ url_for('guardar_cotizacion_clientes') }}" method="POST">
         
-        <div class="">
-            
-            
+        <div class="">    
 
              <div class="app-form-field app-form-field--full">
                 <label class="form-label" for="nombre-cliente">Nombre del cliente</label>
@@ -42,7 +40,7 @@
             <div class="row contenedor-inputs">
 
             <div class="">
-                <label class="form-label" for="direccion-cliente">RIF</label>
+                <label class="form-label" for="RIF">RIF</label>
                 <input id="RIF" name="RIF" class="form-control" placeholder="23-000-0007"
                 type="text">
             </div>
@@ -55,24 +53,16 @@
             </div>
 
             <div class="app-form-field app-form-field--full">
-                <label class="form-label" for="direccion-cliente">Email</label>
+                <label class="form-label" for="email">Email</label>
                 <input id="email" name="email" class="form-control" placeholder="Estado, municipio y dirección" type="text">
             </div>
 
             <div class="app-form-field app-form-field--full">
-                <label class="form-label" for="direccion-cliente">Telefono</label>
+                <label class="form-label" for="telefono">Telefono</label>
                 <input id="telefono" name="telefono" class="form-control" placeholder="Estado, municipio y dirección" type="text">
-            </div>
-
-            </div>
-
-            <div class="app-form-field app-form-field--full">
-                <button class="btn btn-primary" type="submit">Guardar cliente</button>
-            </div>
+            </div>       
 
         </div>
-    
-    </form>
 
 </div>
 
@@ -121,13 +111,9 @@
 
     <!-- Div de la tabla de cotizacion -->
 
-    <form action="{{ url_for('guardar_cotizacion_clientes') }}" method="POST">
-
-    <input type="hidden" name="nombre-cliente-c" class="nombre-cliente-c" id="nombre-cliente-c">
-
     <div class="d-flex justify-content-center">
         
-        <table class="table align-middle text-center w-auto" style="min-width: 400px;" id="tabla-productos">
+        <table class="table align-middle text-center w-auto" style="min-width: 90%; max-width: 95%;" id="tabla-productos">
             
             <thead>
                 <tr>
@@ -138,7 +124,7 @@
                     <th scope="col">Tasa de pago</th>
                     <th scope="col">Porcentaje Ag.</th>
                     <th scope="col">Valor Bs.</th>
-                    <th scope="col">Valor $.</th>
+                    <!-- <th scope="col">Valor $.</th> -->
                     <th scope="col">Ganancia Sob. Cost.</th>
                     <th scope="col">Margen de Ganancia</th>
                     <th scope="col">Descuento</th>
@@ -153,7 +139,7 @@
                 <tr>
 
                     <th scope="row">
-                        <select class="form-select select-producto" name="producto[]" aria-label="Seleccionar producto" onchange="cargarDatosProducto(this)">
+                        <select class="form-select select-producto" name="producto[]" aria-label="Seleccionar producto" onchange="cargarDatosProducto(this)" >
                         <option value="" disabled selected>Seleccionar producto</option>
                             {% for product in productos %}
                         <option value="{{ product.id }}">{{ product.NOMBRE }}</option>
@@ -161,7 +147,7 @@
                     </select>
                     </th>        
 
-                    <td><input type="text" class="precioporunidad" name="precioporunidad[]" id="precioporunidad" 
+                    <td><input type="text" class="precioporunidad" style="max-width: 20px;" name="precioporunidad[]" id="precioporunidad"  
                     required oninput="multiplicacion(this)"></td>
                     
                     <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto[]" id="cantidad-producto"
@@ -179,7 +165,7 @@
                     <td><input type="text" class="form-control precio-venta" name="precio-venta[]" id="precio-venta" aria-label="Amount (to the nearest dollar)"
                     required oninput="multiplicacion(this)" readonly></td>
 
-                    <td><input type="text" class="form-control ValorActualD" name="ValorActualD[]" id="ValorActualD" readonly></td>
+                    <!--<td><input type="text" class="form-control ValorActualD" name="ValorActualD[]" id="ValorActualD" readonly></td> -->
 
                     <td><input type="text" class="form-control gananciasobrecosto" name="gananciasobrecosto[]" id="gananciasobrecosto" aria-label="Amount (to the nearest dollar)" readonly></td>
 

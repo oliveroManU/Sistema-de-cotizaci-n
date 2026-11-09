@@ -724,6 +724,9 @@ def eliminar_producto1(productos_id):
 # ─────────────────────────────────────────────
 # Registrar CLIENTES
 # ─────────────────────────────────────────────
+
+'''
+
 @app.route('/cliente/guardar', methods=['POST'])
 @login_required
 def guardar_cliente():
@@ -760,10 +763,17 @@ def guardar_cliente():
         conn.close()
 
     return redirect(url_for('home'))
+    
+'''
 
 @app.route('/guardar_cotizacion_clientes', methods=['POST'])
 def guardar_cotizacion_clientes():
-    cliente = request.form.get('nombre-cliente-c', 'Cliente Sin Nombre')
+    cliente = request.form.get('nombre-cliente-c', '').strip() or 'Cliente Sin Nombre'
+    rif       = request.form.get('RIF', '').strip()
+    direccion = request.form.get('direccion-cliente', '').strip()
+    email     = request.form.get('email', '').strip()
+    telefono  = request.form.get('telefono', '').strip()
+
     productos     = request.form.getlist('producto[]')
     precios_unid  = request.form.getlist('precioporunidad[]')
     cantidades    = request.form.getlist('cantidad-producto[]')
@@ -807,7 +817,47 @@ def guardar_cotizacion_clientes():
             return 0 if es_entero else 0.0
 
     try:
-        # INSERT del pedido con los totales
+        # ==========================================================
+        # 1) GUARDAR / VERIFICAR CLIENTE (lógica de guardar_cliente)
+        # ==========================================================
+        cliente_id = None
+        cliente_existente = cur.execute(
+            "SELECT id_cliente FROM clientes WHERE nombre = ?", (cliente,)
+        ).fetchone()
+
+        if cliente_existente:
+            cliente_id = cliente_existente[0]
+            print(f"DEBUG: Cliente existente ID={cliente_id}")
+        else:
+            # Solo creamos el cliente si hay un nombre válido
+            if cliente and cliente != 'Cliente Sin Nombre':
+                cur.execute(
+                    'INSERT INTO clientes (nombre, RIF, direccion, email, telefono) '
+                    'VALUES (?, ?, ?, ?, ?)',
+                    (cliente, rif, direccion, email, telefono)
+                )
+                cliente_id = cur.lastrowid
+                print(f"DEBUG: Cliente nuevo creado ID={cliente_id}")
+
+                # Historial solo si hay usuario logueado
+                try:
+                    from flask_login import current_user
+                    if current_user and current_user.is_authenticated:
+                        SaveglobalHistory(
+                            conn,
+                            current_user.id,
+                            f'{current_user.nombre} (ID: {current_user.id})',
+                            'Crear cliente',
+                            {'cliente_id': cliente_id, 'nombre': cliente}
+                        )
+                except Exception as e_hist:
+                    print(f"⚠️ No se pudo guardar historial de cliente: {e_hist}")
+            else:
+                print("DEBUG: Sin nombre válido, no se crea cliente.")
+
+        # ==========================================================
+        # 2) INSERT del pedido con los totales
+        # ==========================================================
         cur.execute("""
             INSERT INTO pedidos (fecha, cliente, tasa, subtotal, total_iva)
             VALUES (datetime('now'), ?, ?, ?, ?)
@@ -816,6 +866,9 @@ def guardar_cotizacion_clientes():
 
         print(f"DEBUG: Recibí {len(productos)} productos. Datos: {productos}")
 
+        # ==========================================================
+        # 3) INSERT del detalle
+        # ==========================================================
         for i in range(len(productos)):
             if not productos[i] or productos[i].strip() == '':
                 continue

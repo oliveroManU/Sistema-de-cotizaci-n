@@ -3,7 +3,6 @@ function multiplicacion(elemento) {
     
     const ValorPorUnidad = parseFloat(fila.querySelector('.precioporunidad').value) || 0;
     const CantidadProducto = parseFloat(fila.querySelector('.cantidad-producto').value) || 0;
-    // const TasaPagoProducto = parseFloat(fila.querySelector('.tasapago').value) || 0;
     const TasaPagoProductoHoy = parseFloat(fila.querySelector('.tasapagohoy').value) || 0;
     const PorcentajeDeGanancia = parseFloat(fila.querySelector('.porcentajeCV').value) || 0;
 
@@ -17,12 +16,6 @@ function multiplicacion(elemento) {
     }
 
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
-
-    const PorcentajeValorActualDolar = TasaPagoProductoHoy !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProductoHoy)) : 0;
-    fila.querySelector('.ValorActualD').value = PorcentajeValorActualDolar.toFixed(4)
-
-    const gananciabs = PrecioVenta - PrecioProducto;  
-    fila.querySelector('.gananciaBs').value = gananciabs.toFixed(4);
 
     const GananciaSobreCosto = PrecioProducto * (PorcentajeDeGanancia / 100);
     fila.querySelector('.gananciasobrecosto').value = GananciaSobreCosto.toFixed(4); 
@@ -48,16 +41,6 @@ function multiplicacion(elemento) {
     if (fila.querySelector('.monto-iva-d')) {
         fila.querySelector('.monto-iva-d').value = MontoIVADolares.toFixed(2);
     }   
-
-    /// const PrecioDolares = TasaPagoProducto !== 0 ? (PrecioProducto  / TasaPagoProducto) : 0;
-    /// const total = TasaPagoProducto !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProducto)) : 0;
-    /// const PorcentajeDevaluacion = ((TasaPagoProductoHoy - TasaPagoProducto)/TasaPagoProducto)*100
-
-   
-    /// fila.querySelector('.preciod').value = PrecioDolares.toFixed(2);
-    /// fila.querySelector('.gananciaD').value = total.toFixed(4);
-    /// fila.querySelector('.porcentajedevaluacion').value = PorcentajeDevaluacion.toFixed(2);
-       
 
     calcularTotalGeneral();
 }

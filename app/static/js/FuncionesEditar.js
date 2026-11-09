@@ -21,9 +21,6 @@ function multiplicacion(elemento) {
     const PorcentajeValorActualDolar = TasaPagoProductoHoy !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProductoHoy)) : 0;
     fila.querySelector('.ValorActualD').value = PorcentajeValorActualDolar.toFixed(4)
 
-    // const PrecioDolaresHoy = TasaPagoProductoHoy !== 0 ? (PrecioProducto  / TasaPagoProductoHoy) : 0;
-    // fila.querySelector('.preciod1').value = PrecioDolaresHoy.toFixed(4)
-
     const gananciabs = PrecioVenta - PrecioProducto;  
     fila.querySelector('.gananciaBs').value = gananciabs.toFixed(4);
 

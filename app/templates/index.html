@@ -125,9 +125,9 @@
 
     <input type="hidden" name="nombre-cliente-c" class="nombre-cliente-c" id="nombre-cliente-c">
 
-    <div class="table-responsive">
+    <div class="d-flex justify-content-center">
         
-        <table class="table align-middle" id="tabla-productos">
+        <table class="table align-middle text-center w-auto" style="min-width: 400px;" id="tabla-productos">
             
             <thead>
                 <tr>
@@ -147,21 +147,19 @@
                 </tr>
             
             </thead>
+
             <tbody id="cuerpo-tabla">
+                
                 <tr>
 
                     <th scope="row">
-                        <select class="form-select" name="producto[]" aria-label="Seleccionar producto">
-                            <option value="" disabled selected>Seleccionar producto</option>
+                        <select class="form-select select-producto" name="producto[]" aria-label="Seleccionar producto" onchange="cargarDatosProducto(this)">
+                        <option value="" disabled selected>Seleccionar producto</option>
                             {% for product in productos %}
-                                <option value="{{ product.id }}" >{{ product.NOMBRE }}</option>
+                        <option value="{{ product.id }}">{{ product.NOMBRE }}</option>
                             {% endfor %}
-                        </select>
-                    </th>
-
-                    
-            
-        
+                    </select>
+                    </th>        
 
                     <td><input type="text" class="precioporunidad" name="precioporunidad[]" id="precioporunidad" 
                     required oninput="multiplicacion(this)"></td>
@@ -179,7 +177,7 @@
                     required oninput="multiplicacion(this)"> </td>
 
                     <td><input type="text" class="form-control precio-venta" name="precio-venta[]" id="precio-venta" aria-label="Amount (to the nearest dollar)"
-                    required oninput="multiplicacion(this)"></td>
+                    required oninput="multiplicacion(this)" readonly></td>
 
                     <td><input type="text" class="form-control ValorActualD" name="ValorActualD[]" id="ValorActualD" readonly></td>
 
@@ -189,10 +187,11 @@
                     readonly></td>
 
                     <td>
-            <input type="text" class="form-control descuento" name="descuento[]" oninput="multiplicacion(this)">
-            <!-- Corregido: etiqueta en minúsculas, sin cierre, con corchetes en el name y con value por defecto -->
-            <input type="hidden" class="pdescuento" name="pdescuento[]" value="0">
-        </td>
+                        <input type="text" class="form-control descuento" name="descuento[]" oninput="multiplicacion(this)">
+                        <!-- Corregido: etiqueta en minúsculas, sin cierre, con corchetes en el name y con value por defecto -->
+                        <input type="hidden" class="pdescuento" name="pdescuento[]" value="0">
+                    </td>
+                    
                     <td>
                         <div class="contenedor-inputs">
                         <input type="text" class="form-control descuentobs" name="descuentobs[]" id="descuentobs" aria-label="Amount (to the nearest dollar)"
@@ -205,12 +204,14 @@
                     <td><button type="button" class="btn btn-outline-danger btn-sm" onclick="eliminarFila(this)">Eliminar</button></td>
                     
                 </tr>
+
             </tbody>
+
         </table>
+
     </div>
+    
     <p class="app-table-scroll-note d-md-none">Desliza la tabla horizontalmente para ver todas las columnas.</p>
-
-
 
     <!-- Botones de Agregar producto y eliminar productos-->
 
@@ -226,31 +227,12 @@
 
         <label for="total-general"><strong>Subtotal</strong></label>
         <input type="text" id="total-general" name="total-general" readonly placeholder="0,00" class="form-control">
-        <input type="text" id="total-generald" name="total-generald" readonly placeholder="0,00" class="form-control">
-        <label for="total-general"><strong>+ IVA</strong></label>
         <input type="text" id="monto-iva-bn" name="monto-iva-bn" readonly placeholder="0,00" class="form-control">
     </div>
+
     </form>
+
 </section>
-
-
-
-    
-
-<!--
-
-<section class="app-rate-panel" aria-label="Tasas de referencia">
-    <div class="app-rate-field">
-        <label for="tasaBcvDolar">Tasa BCV · Dólar</label>
-        <input type="text" id="tasaBcvDolar" class="form-control" readonly placeholder="Buscando tasa...">
-    </div>
-    <div class="app-rate-field">
-        <label for="tasaBcvEuro">Tasa BCV · Euro</label>
-        <input type="text" id="tasaBcvEuro" class="form-control" readonly placeholder="Buscando tasa...">
-    </div>
-</section>
-
--->
 
 {% endblock %}
 
@@ -316,5 +298,52 @@ function eliminarFila(boton) {
         alert('Debe haber al menos una fila de producto.');
     }
 }
+
+async function cargarDatosProducto(select) {
+    const fila = select.closest('tr');
+    const productoId = select.value;
+    if (!productoId) return;
+
+    try {
+        const resp = await fetch(`/api/producto/${productoId}`);
+
+        // Si no hay cotizaciones previas, no hacemos nada
+        if (resp.status === 404) return;
+        if (!resp.ok) throw new Error('Error al consultar producto');
+
+        const data = await resp.json();
+
+        // Mapeo: columna de la tabla -> input de la fila
+        const mapa = {
+            '.precioporunidad':   data.precio_unitario,
+            '.cantidad-producto': data.cantidad,
+            '.precio-producto':   data.precio_total,
+            '.porcentajeCV':      data.porcentaje_ganancia,
+            '.precio-venta':      data.precio_venta,
+            '.gananciasobrecosto': data.ganancia_sobre_costo,
+            '.margen-ganancia':   data.margen_ganancia,     // ajusta si "descuento" no es el IVA
+        };
+
+        for (const [selector, valor] of Object.entries(mapa)) {
+            const input = fila.querySelector(selector);
+            if (input && valor !== null && valor !== undefined) {
+                input.value = valor;
+            }
+        }
+
+        // Recalcular la fila para que se actualicen los readonly
+        // (ValorActualD, descuentobs, descuentod, totales...)
+        const primerInput = fila.querySelector('.precioporunidad');
+        if (typeof multiplicacion === 'function') multiplicacion(primerInput);
+
+        // Si tienes función de total general, refrescarla
+        if (typeof calcularTotalGeneral === 'function') calcularTotalGeneral();
+
+    } catch (err) {
+        console.error('Error al cargar producto:', err);
+        alert('No se pudieron cargar los datos del producto.');
+    }
+}
+
 </script>
 {% endblock %}

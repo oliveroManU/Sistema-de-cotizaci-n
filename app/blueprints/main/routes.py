@@ -3,23 +3,24 @@ import sqlite3
 import requests
 import json
 from functools import wraps
+from sqlalchemy import desc
 import pdfkit
 import urllib3
 from bs4 import BeautifulSoup
 from PIL import Image
-from flask import render_template, request, redirect, url_for, flash, make_response, current_app
+from flask import render_template, request, redirect, url_for, flash, make_response, current_app, jsonify
 from flask_login import UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from . import app, login_manager
 
-def SaveglobalHistory(conn, user_action, action, opdetails):
+def SaveglobalHistory(conn, user_id, user_action, action, opdetails):
     currentdate = datetime.datetime.now().astimezone().isoformat(timespec='seconds')
     details = json.dumps(opdetails, ensure_ascii=False, sort_keys=True)
     conn.execute(
-        'INSERT INTO GLOBAL_HISTORY (USER_ACTION, ACTION, DATE_HOUR, OPERATION_DETAILS) '
-        'VALUES (?, ?, ?, ?)',
-        (user_action, action, currentdate, details)
+        'INSERT INTO historial_global (usuario_id, usuario_accion, accion, date_hour, detalles_operacionales) '
+        'VALUES (?, ?, ?, ?, ?)',
+        (user_id, user_action, action, currentdate, details)
     )
 
 urllib3.disable_warnings()
@@ -115,7 +116,40 @@ def home():
     conn.close()
     return render_template('index.html', productos=productos, clientes=clientes, tasa_bcv_dolar=tasa_bcv_dolar)
 
+@app.route('/api/producto/<int:producto_id>')
+@login_required
+def api_producto(producto_id):
+    conn = connect_db()
+    conn.row_factory = sqlite3.Row
+    reg = conn.execute('''
+        SELECT * FROM reg_cotizaciones
+        WHERE producto_id = ?
+        ORDER BY fecha DESC, id DESC
+        LIMIT 1
+    ''', (producto_id,)).fetchone()
+    conn.close()
 
+    if reg is None:
+        return jsonify({'error': 'Sin cotizaciones previas para este producto'}), 404
+
+    return jsonify({
+        'producto_id': reg['producto_id'],
+        'nombre_producto': reg['nombre_producto'],
+        'marca_producto': reg['marca_producto'],
+        'precio_unitario': reg['precio_unitario'],
+        'cantidad': reg['cantidad'],
+        'precio_total': reg['precio_total'],
+        'tasa_bcv': reg['tasa_bcv'],
+        'porcentaje_ganancia': reg['porcentaje_ganancia'],
+        'precio_venta': reg['precio_venta'],
+        'ganancia_bs': reg['ganancia_bs'],
+        'ganancia_usd': reg['ganancia_usd'],
+        'ganancia_sobre_costo': reg['ganancia_sobre_costo'],
+        'margen_ganancia': reg['margen_ganancia'],
+        'monto_iva': reg['monto_iva'],
+        'precio_con_iva': reg['precio_con_iva'],
+        'monto_iva_usd': reg['monto_iva_usd'],
+    })
 
 # ─────────────────────────────────────────────
 # LOGIN / LOGOUT
@@ -206,7 +240,9 @@ def admin_crear_usuario():
             (nombre, email, generate_password_hash(password), nivel)
         )
         SaveglobalHistory(
-            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            conn,
+            current_user.id,
+            f'{current_user.nombre} (ID: {current_user.id})',
             'Crear usuario',
             {'usuario_id': cursor.lastrowid, 'nombre': nombre, 'email': email, 'nivel': nivel}
         )
@@ -246,7 +282,9 @@ def admin_toggle_usuario(user_id):
         nuevo_estado = 1 - usuario['activo']
         conn.execute('UPDATE usuarios SET activo = ? WHERE id = ?', (nuevo_estado, user_id))
         SaveglobalHistory(
-            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            conn,
+            current_user.id,
+            f'{current_user.nombre} (ID: {current_user.id})',
             'Activar usuario' if nuevo_estado else 'Desactivar usuario',
             {'usuario_id': user_id, 'nombre': usuario['nombre'], 'email': usuario['email']}
         )
@@ -286,7 +324,9 @@ def admin_reset_password(user_id):
             (generate_password_hash(nueva), user_id)
         )
         SaveglobalHistory(
-            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            conn,
+            current_user.id,
+            f'{current_user.nombre} (ID: {current_user.id})',
             'Restablecer contraseña de usuario',
             {'usuario_id': user_id, 'nombre': usuario['nombre'], 'email': usuario['email']}
         )
@@ -321,7 +361,9 @@ def admin_eliminar_usuario(user_id):
 
         conn.execute('DELETE FROM usuarios WHERE id = ?', (user_id,))
         SaveglobalHistory(
-            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            conn,
+            current_user.id,
+            f'{current_user.nombre} (ID: {current_user.id})',
             'Eliminar usuario',
             {'usuario_id': user_id, 'nombre': usuario['nombre'],
              'email': usuario['email'], 'nivel': usuario['nivel']}
@@ -336,6 +378,48 @@ def admin_eliminar_usuario(user_id):
         conn.close()
     return redirect(url_for('admin_usuarios'))
 
+@app.route('/historial_global')
+@login_required
+@admin_required
+def historial_global():
+    conn = connect_db()
+    conn.row_factory = sqlite3.Row
+    registros = conn.execute('''
+        SELECT id, usuario_id, usuario_accion, accion, date_hour, detalles_operacionales
+        FROM historial_global
+        ORDER BY date_hour DESC, id DESC
+    ''').fetchall()
+    conn.close()
+    return render_template('historial_global.html', registros=registros, usuario_filtrado=None)
+
+@app.route('/historial_global/<int:user_id>')
+@login_required
+@admin_required
+def historial_global_usuario(user_id):
+    conn = connect_db()
+    conn.row_factory = sqlite3.Row
+
+    usuario = conn.execute(
+        'SELECT id, nombre, email, nivel FROM usuarios WHERE id = ?', (user_id,)
+    ).fetchone()
+
+    if usuario is None:
+        conn.close()
+        flash('Usuario no encontrado.', 'no')
+        return redirect(url_for('admin_usuarios'))
+
+    # ← Ahora sí filtramos por la columna usuario_id, que es limpia y numérica
+    registros = conn.execute('''
+        SELECT id, usuario_id, usuario_accion, accion, date_hour, detalles_operacionales
+        FROM historial_global WHERE usuario_id = ? ORDER BY date_hour DESC, id DESC
+    ''', (user_id,)).fetchall()
+    conn.close()
+
+    return render_template(
+        'historial_global.html',
+        registros=registros,
+        usuario_filtrado=usuario
+    )
 
 # ─────────────────────────────────────────────
 # MOSTRADOR
@@ -447,7 +531,9 @@ def cotizacion_int():
                  preciod, precioventa, gananciaD, gananciaBs)
             )
             SaveglobalHistory(
-                conn, f'{current_user.nombre} (ID: {current_user.id})',
+                conn,
+                current_user.id,
+                f'{current_user.nombre} (ID: {current_user.id})',
                 'Crear producto',
                 {'producto_id': cursor.lastrowid, 'nombre': nombre, 'precio': precio,
                  'cantidad': cantidad, 'precio_venta': precioventa}
@@ -558,7 +644,9 @@ def actualizar_productos1(productos_id):
             cotizacion_id = conn.execute('SELECT last_insert_rowid()').fetchone()[0]
 
             SaveglobalHistory(
-                conn, f'{current_user.nombre} (ID: {current_user.id})',
+                conn,
+                current_user.id,
+                f'{current_user.nombre} (ID: {current_user.id})',
                 'Editar producto',
                 {
                     'producto_id': productos_id,
@@ -572,7 +660,9 @@ def actualizar_productos1(productos_id):
                 }
             )
             SaveglobalHistory(
-                conn, f'{current_user.nombre} (ID: {current_user.id})',
+                conn,
+                current_user.id,
+                f'{current_user.nombre} (ID: {current_user.id})',
                 'Registrar cotización',
                 {
                     'cotizacion_id': cotizacion_id,
@@ -613,7 +703,9 @@ def eliminar_producto1(productos_id):
 
         conn.execute("DELETE FROM productos WHERE id = ?", (productos_id,))
         SaveglobalHistory(
-            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            conn,
+            current_user.id,
+            f'{current_user.nombre} (ID: {current_user.id})',
             'Eliminar producto',
             {'producto_id': productos_id, 'datos': dict(producto)}
         )
@@ -652,7 +744,9 @@ def guardar_cliente():
             (nombre, rif, direccion, email, telefono )
         )
         SaveglobalHistory(
-            conn, f'{current_user.nombre} (ID: {current_user.id})',
+            conn,
+            current_user.id,
+            f'{current_user.nombre} (ID: {current_user.id})',
             'Crear cliente',
             {'cliente_id': cursor.lastrowid, 'nombre': nombre}
         )

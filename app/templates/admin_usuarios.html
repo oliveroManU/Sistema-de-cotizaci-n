@@ -105,6 +105,9 @@
                                 <form method="POST" action="{{ url_for('admin_eliminar_usuario', user_id=u.id) }}" onsubmit="return confirm('¿Eliminar usuario?');">
                                     <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                 </form>
+
+                                 <a class="btn btn-outline-secondary btn-sm" href="{{ url_for('historial_global_usuario', user_id=u.id) }}">Historial</a>
+                                
                             </div>
                         {% else %}
                             <em>(tú)</em>

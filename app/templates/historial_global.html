@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if usuario_filtrado %}
+        Historial de {{ usuario_filtrado['nombre'] }}
+    {% else %}
+        Historial global
+    {% endif %}
+    | Velazcres
+{% endblock %}
+
+{% block content %}
+<section class="app-page-header">
+    <div>
+        <span class="app-eyebrow">Auditoría</span>
+        <h1>
+            {% if usuario_filtrado %}
+                Historial de {{ usuario_filtrado['nombre'] }}
+            {% else %}
+                Historial global
+            {% endif %}
+        </h1>
+        {% if usuario_filtrado %}
+            <p>
+                Mostrando solo las acciones de
+                <strong>{{ usuario_filtrado['nombre'] }}</strong>
+                ({{ usuario_filtrado['email'] }} — {{ usuario_filtrado['nivel'] }}).
+                <a href="{{ url_for('admin_usuarios') }}" class="btn btn-sm btn-outline-secondary ms-2">
+                    ← Volver a usuarios
+                </a>
+                <a href="{{ url_for('historial_global') }}" class="btn btn-sm btn-outline-primary ms-1">
+                    Ver historial global completo
+                </a>
+            </p>
+        {% else %}
+            <p>Registro de todas las acciones realizadas en el sistema.</p>
+        {% endif %}
+    </div>
+</section>
+
+<section class="app-card mt-4">
+    <div class="app-card-heading">
+        <h2>Registros</h2>
+        <p>Total: {{ registros|length }}</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Fecha / Hora</th>
+                    <th scope="col">Usuario</th>
+                    <th scope="col">Acción</th>
+                    <th scope="col">Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in registros %}
+                <tr>
+                    <td>{{ r['id'] }}</td>
+                    <td><small class="text-muted">{{ r['date_hour'] }}</small></td>
+                    <td>{{ r['usuario_accion'] }}</td>
+                    <td>
+                        {% if 'Eliminar' in r['accion'] %}
+                            <span class="badge bg-danger">{{ r['accion'] }}</span>
+                        {% elif 'Crear' in r['accion'] or 'Registrar' in r['accion'] %}
+                            <span class="badge bg-success">{{ r['accion'] }}</span>
+                        {% elif 'Editar' in r['accion'] or 'Actualizar' in r['accion'] %}
+                            <span class="badge bg-warning text-dark">{{ r['accion'] }}</span>
+                        {% else %}
+                            <span class="badge bg-secondary">{{ r['accion'] }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <details>
+                            <summary class="text-primary" style="cursor:pointer;">Ver detalles</summary>
+                            <pre class="mt-2 p-2 bg-light border rounded"
+                                 style="font-size:0.8rem; max-width:600px; white-space:pre-wrap;">{{ r['detalles_operacionales'] }}</pre>
+                        </details>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        Este usuario no tiene acciones registradas.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

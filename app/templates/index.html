@@ -249,9 +249,24 @@
 
         <label for="total-general"><strong>Subtotal</strong></label>
         <span>Bs.</span>
-        <input type="text" id="total-general" name="total-general" readonly placeholder="0,00" class="form-control">
+        <input type="text" id="total-general" name="total-general" readonly placeholder="0,00" class="form-control" oninput="calcularTotalGeneral(this)">
+        
+        <span>$.</span>
+        <input type="text" id="total-generald" name="total-generald" readonly placeholder="0,00" class="form-control">
+        
+        <label for="">descuento</label>        
+        <span>%</span>
+        <input type="text" id="pordescuentopanel" name="pordescuentopanel" placeholder="0.00%" class="form-control" oninput="calcularTotalGeneral(this)">
+
+        <span>Bs.</span>
+        <input type="text" id="descuentobs-panel" name="descuentobs-panel" class="form-control" readonly placeholder="0,00">        
+        <span>$.</span>
+        <input type="text" id="descuentod-panel" name="descuentod-panel" class="form-control" readonly placeholder="0,00">
+        
+        <label for="">Total con IVA</label>
         <span>Bs.</span>
         <input type="text" id="monto-iva-bn" name="monto-iva-bn" readonly placeholder="0,00" class="form-control">
+    
     </div>
 
     </form>

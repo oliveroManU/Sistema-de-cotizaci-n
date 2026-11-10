@@ -110,6 +110,7 @@ function multiplicacion(elemento) {
     }   
 
 
+
     calcularTotalGeneral();
 }
 
@@ -140,30 +141,52 @@ function calcularTotalGeneral() {
     
 
     const subtotal = totalGeneral; 
-    
+
+    // 4. Tasa de pago (Bs por USD)
+    const tasaEl = document.getElementById('tasapagohoy');
+    const tasapago = parseFloat(tasaEl?.value) || 0;
+
+    const subtotald = tasapago !== 0 ? subtotal / tasapago : 0;
+
+    const subtotald1 = document.getElementById('total-generald');
+    if (subtotald1) {
+        subtotald1.value = subtotald.toFixed(2);
+    }
+
+    // 5. Descuento del panel (aplica sobre el subtotal)
+    const inputPorDescuento = document.getElementById('pordescuentopanel');
+    const PDescuentoPanel = parseFloat(inputPorDescuento?.value) || 0;
+
+    const PorDescuento = subtotal * (PDescuentoPanel / 100);
+
+   // 6. Precio con descuento (Bs)
+    const PrecioMasDescuentoPanel = subtotal - PorDescuento;
+
+    const subtotal2El = document.getElementById('descuentobs-panel');
+    if (subtotal2El) {
+        subtotal2El.value = PrecioMasDescuentoPanel.toFixed(2);
+    }
+
+    // 7. Precio con descuento en USD
+    const PrecioMasDescuentoDolarPanel = tasapago !== 0 ? PrecioMasDescuentoPanel / tasapago : 0;
+
+    const inputDescuentoDPanel = document.getElementById('descuentod-panel');
+    if (inputDescuentoDPanel) {
+        inputDescuentoDPanel.value = PrecioMasDescuentoDolarPanel.toFixed(2);
+    }
+
+    // 8. IVA sobre el precio con descuento (Bs)
     const PorcentajeIVA = 16;
-    const MontoIVA = subtotal * (PorcentajeIVA / 100);
-    const MontoConIVA = subtotal + MontoIVA;
+    const MontoIVA = PrecioMasDescuentoPanel * (PorcentajeIVA / 100);
+    const MontoConIVA = PrecioMasDescuentoPanel + MontoIVA;
 
     const inputMontoIvaBn = document.getElementById('monto-iva-bn');
     if (inputMontoIvaBn) {
-        inputMontoIvaBn.value = MontoConIVA.toFixed(2); 
+        inputMontoIvaBn.value = MontoConIVA.toFixed(2);
     }
 
-    const tasapago = document.getElementById('tasapagohoy') || 0;
-    const subtotald = tasapago !== 0 ? (subtotal / tasapago) : 0;
-    
-    // 3. Actualizar el input de Subtotal $ (Usando getElementById en lugar de fila.querySelector)
-    const inputTotalGeneralD = document.getElementById('total-generald');
-    if (inputTotalGeneralD) {
-        inputTotalGeneralD.value = subtotald.toFixed(2);
-    }    
-
-
-
-  
 }
-
+  
 function validarFormulario() {
     const camposObligatorios = [
         document.getElementById('nombre-cliente'),

@@ -768,12 +768,12 @@ def guardar_cliente():
 
 @app.route('/guardar_cotizacion_clientes', methods=['POST'])
 def guardar_cotizacion_clientes():
-    cliente = request.form.get('nombre-cliente', '').strip() or 'Cliente Sin Nombre'
+    cliente   = request.form.get('nombre-cliente', '').strip() or 'Cliente Sin Nombre'
     rif       = request.form.get('RIF', '').strip()
     direccion = request.form.get('direccion-cliente', '').strip()
     email     = request.form.get('email', '').strip()
     telefono  = request.form.get('telefono', '').strip()
-    empresa = request.form.get('empresa', '').strip() or 'No Empresa'
+    empresa   = request.form.get('empresa', '').strip() or 'No Empresa'
 
     productos     = request.form.getlist('producto[]')
     precios_unid  = request.form.getlist('precioporunidad[]')
@@ -792,6 +792,10 @@ def guardar_cotizacion_clientes():
 
     # ---- NUEVOS CAMPOS DEL TOTAL ----
     subtotal      = request.form.get('total-general', '')
+    subtotald     = request.form.get('total-generald', '')
+    por_desc_panel = request.form.get('pordescuentopanel', '')
+    descuento_p   = request.form.get('descuentobs-panel', '')
+    descuentod_p  = request.form.get('descuentod-panel', '')     
     monto_iva     = request.form.get('monto-iva-bn', '')
     tasa_hoy      = request.form.get('tasapagob', '')
 
@@ -801,9 +805,14 @@ def guardar_cotizacion_clientes():
         except ValueError:
             return 0.0
 
-    subtotal_f  = to_float(subtotal)
-    monto_iva_f = to_float(monto_iva)
-    tasa_f      = to_float(tasa_hoy)
+    subtotal_f      = to_float(subtotal)
+    subtotald_f     = to_float(subtotald)
+    por_desc_panel_f = to_float(por_desc_panel)
+    descuento_p_f   = to_float(descuento_p)
+    descuentod_p_f  = to_float(descuentod_p)
+    monto_iva_f     = to_float(monto_iva)
+    tasa_f          = to_float(tasa_hoy)
+    
 
     conn = connect_db()
     cur  = conn.cursor()
@@ -852,7 +861,7 @@ def guardar_cotizacion_clientes():
                             {'cliente_id': cliente_id, 'nombre': cliente}
                         )
                 except Exception as e_hist:
-                    print(f"⚠️ No se pudo guardar historial de cliente: {e_hist}")
+                    print(f" No se pudo guardar historial de cliente: {e_hist}")
             else:
                 print("DEBUG: Sin nombre válido, no se crea cliente.")
 
@@ -860,9 +869,9 @@ def guardar_cotizacion_clientes():
         # 2) INSERT del pedido con los totales
         # ==========================================================
         cur.execute("""
-            INSERT INTO pedidos (fecha, cliente, tasa, subtotal, total_iva)
-            VALUES (datetime('now'), ?, ?, ?, ?)
-        """, (cliente, tasa_f, subtotal_f, monto_iva_f))
+            INSERT INTO pedidos (fecha, cliente, tasa, subtotal, subtotal_d, porc_descuento, subtotal_descuento, subtotal_descuento_d, total_iva)
+            VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (cliente, tasa_f, subtotal_f, subtotald_f, por_desc_panel_f, descuento_p_f, descuentod_p_f, monto_iva_f))
         pedido_id = cur.lastrowid
 
         print(f"DEBUG: Recibí {len(productos)} productos. Datos: {productos}")

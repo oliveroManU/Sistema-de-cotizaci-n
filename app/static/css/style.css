@@ -45,3 +45,18 @@
     margin-left: 60px;
 }
 
+.form-row {
+    display: flex;
+    gap: 1rem;          /* separación entre inputs */
+    flex-wrap: wrap;    /* baja a la siguiente línea en pantallas pequeñas */
+}
+
+.form-row .app-form-field {
+    flex: 1 1 calc(50% - 0.5rem); /* cada uno ocupa ~50% */
+    min-width: 220px;             /* evita que se aplasten demasiado */
+}
+
+.form-control {
+    width: 100%;
+    box-sizing: border-box;
+}

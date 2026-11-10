@@ -25,32 +25,40 @@
         <p>Datos de contacto y facturación</p>
     </div>
 
-<!-- Registro de cliente -->
+<!-- form de datos de cliente -->
 
-<form action="{{ url_for('guardar_cotizacion_clientes') }}" method="POST">
+<form action="{{ url_for('guardar_cotizacion_clientes') }}" method="POST" id="formm">
         
         <div class="">    
 
              <div class="app-form-field app-form-field--full">
                 <label class="form-label" for="nombre-cliente">Nombre del cliente</label>
+                <span id="mensaje" style="color: red;"></span>
                 <input id="nombre-cliente" name="nombre-cliente" class="form-control" placeholder="Nombre y apellido" 
                 type="text" oninput="pasarvalores()" required>
             </div>
 
-            <div class="row contenedor-inputs">
+            <div class="form-row">
 
-            <div class="">
+            <div class="app-form-field">
                 <label class="form-label" for="RIF">RIF</label>
                 <input id="RIF" name="RIF" class="form-control" placeholder="23-000-0007"
                 type="text">
+            </div>
+
+            <div class="app-form-field">
+                <label class="form-label" for="direccion-cliente">Empresa</label>
+                <input id="empresa" name="empresa" class="form-control" placeholder="Empresa *" type="text">
+            </div>
+
             </div>
 
             <div class="">
                 <label class="form-label" for="direccion-cliente">Dirección</label>
                 <input id="direccion-cliente" name="direccion-cliente" class="form-control" placeholder="Estado, municipio y dirección" type="text">
             </div>
-           
-            </div>
+
+            <div class="form-row">
 
             <div class="app-form-field app-form-field--full">
                 <label class="form-label" for="email">Email</label>
@@ -62,11 +70,13 @@
                 <input id="telefono" name="telefono" class="form-control" placeholder="Estado, municipio y dirección" type="text">
             </div>       
 
+            </div>
+
         </div>
 
 </div>
 
-    <!--Div de Form de datos de cotizacion-->
+    <!-- 2 form de detalles-->
 
     <div class="app-card">
 
@@ -77,10 +87,10 @@
         
         </div>
         
-        <div class="app-form-field mb-3">
+        <div class="app-form-field app-form-field--full">
 
             <label class="form-label" for="tipo-moneda">Moneda</label>
-            <select class="form-select" name="tipo-moneda" id="tipo-moneda">
+            <select class="form-control" name="tipo-moneda" id="tipo-moneda">
                 <option value="bs">Bolívares (Bs.)</option>                
             </select>
 
@@ -90,12 +100,36 @@
             
             <label class="form-label" for="Forma">Forma de pago</label>
             
-            <select class="form-select" name="forma-pago" id="Forma">
-                <option value="bs">Transferencia bancaria</option>
-                <option value="dola">Efectivo</option>
-                <option value="">Pago móvil</option>  
+            <select class="form-control" name="forma-pago" id="Forma">
+                <option value="Transferencia">Transferencia bancaria</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Pago-movil">Pago móvil</option>  
             </select>
 
+        </div>
+
+        <div class="app-form-field">
+
+            <label class="form-label" for="">Fecha de validez</label>
+            <input class="form-control" type="datetime-local">
+        
+        </div>
+
+        <div class="app-form-field">
+
+            <label class="form-label" for="">Fecha de validez</label>
+            <select class="form-control" name="form-select" id="">
+
+                <option value="10"> 10 dias</option>
+                <option value="15"> 15 dias</option>
+                <option value="20"> 20 dias</option>
+                <option value="25"> 25 dias</option>
+                <option value="30"> 30 dias</option>
+                <option value="45"> 45 dias</option>
+                <option value="60"> 60 dias</option>
+
+            </select>
+        
         </div>
 
     </div>
@@ -138,16 +172,20 @@
                 
                 <tr>
 
+                    <!-- Seleccionar producto -->
+
                     <th scope="row">
                         <select class="form-select select-producto" name="producto[]" aria-label="Seleccionar producto" onchange="cargarDatosProducto(this)" >
-                        <option value="" disabled selected>Seleccionar producto</option>
-                            {% for product in productos %}
-                        <option value="{{ product.id }}">{{ product.NOMBRE }}</option>
-                            {% endfor %}
-                    </select>
+                            <option value="" disabled selected>Seleccionar producto</option>
+                                {% for product in productos %}
+                            <option value="{{ product.id }}">{{ product.NOMBRE }}</option>
+                                {% endfor %}
+                        </select>
                     </th>        
 
-                    <td><input type="text" class="precioporunidad" style="max-width: 20px;" name="precioporunidad[]" id="precioporunidad"  
+                    <!--  Resto de tabla -->
+
+                    <td><input type="text" class="precioporunidad form-control" style="max-width: 20px;" name="precioporunidad[]" id="precioporunidad"  
                     required oninput="multiplicacion(this)"></td>
                     
                     <td><input class="cantidad-producto form-control" type="text" name="cantidad-producto[]" id="cantidad-producto"
@@ -208,11 +246,11 @@
     </div>
 
     <div class="app-quote-total">
-        <input type="hidden" class="nombre-cliente-a" name="nombre-cliente-a" id="nombre-cliente-a">
-        <input type="hidden" class="tasapagob" name="tasapagob" id="tasapagob"> 
 
         <label for="total-general"><strong>Subtotal</strong></label>
+        <span>Bs.</span>
         <input type="text" id="total-general" name="total-general" readonly placeholder="0,00" class="form-control">
+        <span>Bs.</span>
         <input type="text" id="monto-iva-bn" name="monto-iva-bn" readonly placeholder="0,00" class="form-control">
     </div>
 

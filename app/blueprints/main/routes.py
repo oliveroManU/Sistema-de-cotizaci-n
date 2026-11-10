@@ -768,11 +768,12 @@ def guardar_cliente():
 
 @app.route('/guardar_cotizacion_clientes', methods=['POST'])
 def guardar_cotizacion_clientes():
-    cliente = request.form.get('nombre-cliente-c', '').strip() or 'Cliente Sin Nombre'
+    cliente = request.form.get('nombre-cliente', '').strip() or 'Cliente Sin Nombre'
     rif       = request.form.get('RIF', '').strip()
     direccion = request.form.get('direccion-cliente', '').strip()
     email     = request.form.get('email', '').strip()
     telefono  = request.form.get('telefono', '').strip()
+    empresa = request.form.get('empresa', '').strip() or 'No Empresa'
 
     productos     = request.form.getlist('producto[]')
     precios_unid  = request.form.getlist('precioporunidad[]')
@@ -832,9 +833,9 @@ def guardar_cotizacion_clientes():
             # Solo creamos el cliente si hay un nombre válido
             if cliente and cliente != 'Cliente Sin Nombre':
                 cur.execute(
-                    'INSERT INTO clientes (nombre, RIF, direccion, email, telefono) '
-                    'VALUES (?, ?, ?, ?, ?)',
-                    (cliente, rif, direccion, email, telefono)
+                    'INSERT INTO clientes (nombre, RIF, empresa, direccion, email, telefono) '
+                    'VALUES (?, ?, ?, ?, ?, ?)',
+                    (cliente, rif, empresa, direccion, email, telefono)
                 )
                 cliente_id = cur.lastrowid
                 print(f"DEBUG: Cliente nuevo creado ID={cliente_id}")

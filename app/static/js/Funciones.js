@@ -164,104 +164,41 @@ function calcularTotalGeneral() {
   
 }
 
-
-
-function pasarvalores() {
-    const nombre = document.getElementById('nombre-cliente').value.trim();
-    document.getElementById('nombre-cliente-a').value = nombre;
-    document.getElementById('nombre-cliente-c').value = nombre;
-
-    const tasa = document.querySelector('.tasapagohoy');
-    if (tasa) document.getElementById('tasapagob').value = tasa.value;
-}
-// ===============================
-// BANCO CENTRAL DE VENEZUELA
-// ===============================
-
-async function obtenerTasaBCV() {
-    try {
-        // Petición a una API pública que rastrea el BCV en formato JSON
-        let respuesta = await fetch('https://rates.dolarvzla.com/bcv/current.json');
-        let datos = await respuesta.json();
-
-        // Extraemos la tasa del dólar oficial
-        let tasaOficial = datos.current.usd;
-
-        // Asignamos el valor al input que tiene id="tasaBcvDolar"
-        document.getElementById('tasaBcvDolar').value = tasaOficial.toFixed(4);
-
-    } catch (error) {
-        console.error("No se pudo obtener la tasa del BCV:", error);
-        document.getElementById('tasaBcvDolar').placeholder = "Error al cargar";
-    }
-}
-
-async function obtenerTasaBCVEuro() {
-    try {
-        // Petición a la API pública que rastrea las tasas del BCV
-        let respuesta = await fetch('https://rates.dolarvzla.com/bcv/current.json');
-        let datos = await respuesta.json();
-
-        // Extraemos la tasa oficial del Euro (.eur en lugar de .usd)
-        let tasaEuro = datos.current.eur;
-
-        // Asignamos el valor al input que tiene id="tasaBcvEuro"
-        document.getElementById('tasaBcvEuro').value = tasaEuro.toFixed(4);
-
-    } catch (error) {
-        console.error("No se pudo obtener la tasa del Euro:", error);
-        document.getElementById('tasaBcvEuro').placeholder = "Error al cargar";
-    }
-}
-
 function validarFormulario() {
-    // Seleccionamos los inputs por su clase
     const camposObligatorios = [
-        document.querySelector('.nombre-cliente'),
-        document.querySelector('.RIF'),
-        document.querySelector('.direccion-cliente'),
-        document.querySelector('.telefono'),
-        document.querySelector('.email'),
+        document.getElementById('nombre-cliente'),
+        document.getElementById('RIF'),
+        document.getElementById('direccion-cliente'),
+        document.getElementById('telefono'),
+        document.getElementById('empresa'),
+        document.getElementById('email'),
     ];
 
-    let errores = [];
+    const errores = [];
 
-    camposObligatorios.forEach(campo => {
-        // ⚠️ Protección: si el campo no existe, saltamos
+    // for...of so we can `break`/`return` cleanly if needed
+    for (const campo of camposObligatorios) {
         if (!campo) {
-            console.warn("⚠️ Algún selector no encontró el elemento. Revisa las clases en el HTML.");
-            return;
+            console.warn('⚠️ Selector no encontró el elemento. Revisa los IDs en el HTML.');
+            continue;
         }
 
-        campo.classList.remove('error'); // Quitar error previo
-        
-        if (campo.value.trim() === "") {
-            campo.classList.add('error'); // Borde rojo
-            // Usamos el placeholder o el name para el mensaje (más amigable)
+        campo.classList.remove('error');
+
+        if (campo.value.trim() === '') {
+            campo.classList.add('error');
             errores.push(campo.placeholder || campo.name || 'campo');
         }
-    });
+    }
 
+    // ← alerta DESPUÉS del loop, no dentro
     if (errores.length > 0) {
-        alert("Faltan datos en: " + errores.join(", "));
+        alert('Faltan datos en: ' + errores.join(', '));
         return false;
     }
 
     return true;
 }
-
-// Asignar al botón ( verifica el ID real en tu HTML)
-document.getElementById('form').addEventListener('submit', function(e) {
-    // Si la validación falla, bloqueamos el envío
-    if (!validarFormulario()) {
-        e.preventDefault(); 
-
-        
-
-    }
-    
-    // Si pasa la validación, el navegador envía el formulario normalmente
-});
 
 if (boton) {
     boton.addEventListener('click', function(e) {

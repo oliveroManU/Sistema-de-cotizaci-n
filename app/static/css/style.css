@@ -60,3 +60,17 @@
     width: 100%;
     box-sizing: border-box;
 }
+
+textarea {
+    width: 100%;
+    height: 80px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    
+    /* Esta línea fija el tamaño del textarea */
+    resize: none; 
+    
+    /* Recomendado: evita que el padding desborde el ancho del 100% */
+    box-sizing: border-box; 
+}

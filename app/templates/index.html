@@ -42,8 +42,17 @@
 
             <div class="app-form-field">
                 <label class="form-label" for="RIF">RIF</label>
-                <input id="RIF" name="RIF" class="form-control" placeholder="23-000-0007"
+                <div class="input-group mb-3">
+                <select class="input-group-text" name="RIF-lt">
+                    <option value="V-">V</option>
+                    <option value="E-">E</option>
+                    <option value="J-">J</option>
+                    <option value="G-">G</option>
+                    <option value="P-">P</option>
+                </select>
+                <input id="RIF" name="RIF" class="form-control" placeholder="23000000-0" maxlength="10" minlength="9"
                 type="text">
+                </div>
             </div>
 
             <div class="app-form-field">
@@ -67,7 +76,7 @@
 
             <div class="app-form-field app-form-field--full">
                 <label class="form-label" for="telefono">Telefono</label>
-                <input id="telefono" name="telefono" class="form-control" placeholder="Estado, municipio y dirección" type="text">
+                <input id="telefono" name="telefono" class="form-control" placeholder="Estado, municipio y dirección" type="text" maxlength="11">
             </div>       
 
             </div>
@@ -87,20 +96,11 @@
         
         </div>
         
-        <div class="app-form-field app-form-field--full">
-
-            <label class="form-label" for="tipo-moneda">Moneda</label>
-            <select class="form-control" name="tipo-moneda" id="tipo-moneda">
-                <option value="bs">Bolívares (Bs.)</option>                
-            </select>
-
-        </div>
-
         <div class="app-form-field">
             
             <label class="form-label" for="Forma">Forma de pago</label>
             
-            <select class="form-control" name="forma-pago" id="Forma">
+            <select class="form-control" name="forma-pago" id="forma-pago">
                 <option value="Transferencia">Transferencia bancaria</option>
                 <option value="Efectivo">Efectivo</option>
                 <option value="Pago-movil">Pago móvil</option>  
@@ -110,15 +110,15 @@
 
         <div class="app-form-field">
 
-            <label class="form-label" for="">Fecha de validez</label>
-            <input class="form-control" type="datetime-local">
+            <label class="form-label" >Fecha de validez</label>
+            <input class="form-control" type="datetime-local" id="fecha-emision" name="fecha-emision">
         
         </div>
 
         <div class="app-form-field">
 
             <label class="form-label" for="">Fecha de validez</label>
-            <select class="form-control" name="form-select" id="">
+            <select class="form-control" name="dias-validos" id="dias-validos">
 
                 <option value="10"> 10 dias</option>
                 <option value="15"> 15 dias</option>
@@ -130,6 +130,18 @@
 
             </select>
         
+        </div>
+
+        <div>
+
+        <div class="app-form-field app-form-field--full">
+
+            <label class="form-label" for="tipo-moneda">Descripción de operación <span>( Opcional )</span></label>
+            <textarea class="form-control" name="descripcion" id="descripcion" maxlength="240"></textarea>
+            
+        </div>
+
+
         </div>
 
     </div>
@@ -383,6 +395,20 @@ async function cargarDatosProducto(select) {
         alert('No se pudieron cargar los datos del producto.');
     }
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+        const inputFecha = document.getElementById('fecha-emision'); 
+        
+        if (inputFecha) {
+            const ahora = new Date();
+            
+            // Ajustar la zona horaria local (Restamos el offset en milisegundos)
+            const opciones = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            textFecha.textContent = ahora.toLocaleString('es-ES', opciones);
+        }
+    });
+
+
 
 </script>
 {% endblock %}

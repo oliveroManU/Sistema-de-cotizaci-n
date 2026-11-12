@@ -768,13 +768,22 @@ def guardar_cliente():
 
 @app.route('/guardar_cotizacion_clientes', methods=['POST'])
 def guardar_cotizacion_clientes():
+    
+    #Datos del cliente
     cliente   = request.form.get('nombre-cliente', '').strip() or 'Cliente Sin Nombre'
-    rif       = request.form.get('RIF', '').strip()
+    rif = request.form.get('RIF-lt', '').strip() + request.form.get('RIF', '').strip().replace('-', '')
     direccion = request.form.get('direccion-cliente', '').strip()
     email     = request.form.get('email', '').strip()
     telefono  = request.form.get('telefono', '').strip()
     empresa   = request.form.get('empresa', '').strip() or 'No Empresa'
 
+    # Datos de la cotizacion
+    
+    forma_de_pago = request.form.get('forma-pago', '')
+    dias_validos = request.form.get('dias-validos', '')
+    descripcion_p = request.form.get('descripcion', '')
+
+    # Datos de producto Unico
     productos     = request.form.getlist('producto[]')
     precios_unid  = request.form.getlist('precioporunidad[]')
     cantidades    = request.form.getlist('cantidad-producto[]')
@@ -790,7 +799,7 @@ def guardar_cotizacion_clientes():
     descuentos_bs = request.form.getlist('descuentobs[]')
     descuentos_d  = request.form.getlist('descuentod[]')
 
-    # ---- NUEVOS CAMPOS DEL TOTAL ----
+    # ---- Subtotal-Total General ----
     subtotal      = request.form.get('total-general', '')
     subtotald     = request.form.get('total-generald', '')
     por_desc_panel = request.form.get('pordescuentopanel', '')
@@ -812,7 +821,6 @@ def guardar_cotizacion_clientes():
     descuentod_p_f  = to_float(descuentod_p)
     monto_iva_f     = to_float(monto_iva)
     tasa_f          = to_float(tasa_hoy)
-    
 
     conn = connect_db()
     cur  = conn.cursor()
@@ -869,9 +877,9 @@ def guardar_cotizacion_clientes():
         # 2) INSERT del pedido con los totales
         # ==========================================================
         cur.execute("""
-            INSERT INTO pedidos (fecha, cliente, tasa, subtotal, subtotal_d, porc_descuento, subtotal_descuento, subtotal_descuento_d, total_iva)
-            VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (cliente, tasa_f, subtotal_f, subtotald_f, por_desc_panel_f, descuento_p_f, descuentod_p_f, monto_iva_f))
+            INSERT INTO pedidos (fecha, cliente, tasa, subtotal, subtotal_d, porc_descuento, subtotal_descuento, subtotal_descuento_d, total_iva, forma_de_pago, dias_validos, descripcion)
+            VALUES (datetime('now'), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (cliente, tasa_f, subtotal_f, subtotald_f, por_desc_panel_f, descuento_p_f, descuentod_p_f, monto_iva_f, forma_de_pago, dias_validos, descripcion_p))
         pedido_id = cur.lastrowid
 
         print(f"DEBUG: Recibí {len(productos)} productos. Datos: {productos}")

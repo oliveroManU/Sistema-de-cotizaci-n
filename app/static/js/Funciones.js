@@ -1,33 +1,64 @@
 const inputnombrecliente = document.getElementById('nombre-cliente');
-
 inputnombrecliente.addEventListener('input', function() {
-
-    // Acepta solo letras
     this.value = this.value.replace (/[^A-Za-zÁÉÍÓÚáéíóúÑñ\s]/g, '');  
-
 });
 
-const RifFiscalCliente = document.getElementById('riff-cliente');
 
+
+const RifFiscalCliente = document.getElementById('RIF');
 RifFiscalCliente.addEventListener('input', function() {
-
     this.value = this.value.replace (/[^0-9]/g, '');
-
 });
 
+RifFiscalCliente.addEventListener('input', function (e) {
+    // 1. Limpia todo lo que no sea número (reemplaza tus dos líneas de limpieza anteriores)
+    let valorLimpioRif = e.target.value.replace(/\D/g, '');
+    
+    // 2. Agrupa de 4 en 4 y une con guiones
+    let valorFormatearRif = valorLimpioRif.match(/.{1,8}/g)?.join('-') || '';
+    
+    // 3. Muestra el resultado en el input
+    e.target.value = valorFormatearRif;
+});
 
-const TelefonoCliente = document.getElementById('Telefono-client');
-
+const TelefonoCliente = document.getElementById('telefono');
 TelefonoCliente.addEventListener('input', function() {
-
     this.value = this.value.replace (/[^0-9]/g, '');
 
 });
 
-// ===============================
-// GESTIÓN DE FILAS DE PRODUCTOS
-// ===============================
+const email = document.getElementById('email');
 
+function validarCorreo(val_email) {
+  // 1. Verificar longitud mínima y máxima total (ej. mínimo 6: a@b.co, máximo 254)
+    if (val_email.length < 6 || val_email.length > 254) {
+        return false; 
+  }
+    const emailregex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+    if (!emailregex.test(val_email)){
+        alert('Correo no valido')
+    }
+
+    const letras = val_email.split('@');
+    if (letras[0].length > 48) {
+        return false;
+    }
+
+    return true;
+}
+
+email.addEventListener('blur', function() {
+    if (!validarCorreo(this.value.trim())) {
+        alert('Correo no valido')
+    }
+})
+
+const Descripcion = document.getElementById('descripcion')
+if (Descripcion.length > 240) {
+    alert('Mucho texto')
+}
+
+// GESTIÓN DE FILAS DE PRODUCTOS
 
 function eliminarFila(boton) {
     const fila = boton.closest('tr');
@@ -65,23 +96,12 @@ function multiplicacion(elemento) {
 
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
 
-    //  const PorcentajeValorActualDolar = TasaPagoProductoHoy !== 0 ? ((PrecioVenta - PrecioProducto)/(TasaPagoProductoHoy)) : 0;
-    //  fila.querySelector('.ValorActualD').value = PorcentajeValorActualDolar.toFixed(4)
-
-    // const PrecioDolaresHoy = TasaPagoProductoHoy !== 0 ? (PrecioProducto  / TasaPagoProductoHoy) : 0;
-    // fila.querySelector('.preciod1').value = PrecioDolaresHoy.toFixed(4)
-
-    // const gananciabs = PrecioVenta - PrecioProducto;  
-    // fila.querySelector('.gananciaBs').value = gananciabs.toFixed(4);
-
-    
-
     const GananciaSobreCosto = PrecioProducto * (PorcentajeDeGanancia / 100);
     fila.querySelector('.gananciasobrecosto').value = GananciaSobreCosto.toFixed(4); 
-
+    
     const MargendeGanancia = PrecioVenta !== 0 ? ((PrecioVenta + PrecioProducto) / PrecioVenta) * 100: 0;
     fila.querySelector('.margen-ganancia').value = MargendeGanancia.toFixed(4);
-
+    
     const PDescuento = parseFloat(fila.querySelector('.descuento').value) || 0;
     
     if (elemento.classList.contains('descuento')) {
@@ -91,7 +111,6 @@ function multiplicacion(elemento) {
     }
 
     const PorcentajeDescuento = parseFloat(fila.querySelector('.pdescuento').value) || 0;
-
     const PrecioMasDescuento = PrecioVenta - PorcentajeDescuento;
     // const  = PrecioVenta - MontoDescuento;
 
@@ -108,8 +127,6 @@ function multiplicacion(elemento) {
     if (fila.querySelector('.descuentod')) {
         fila.querySelector('.descuentod').value = PrecioMasDescuentoDolar.toFixed(2);
     }   
-
-
 
     calcularTotalGeneral();
 }
@@ -138,14 +155,10 @@ function calcularTotalGeneral() {
         inputTotalGeneral.value = totalGeneral.toFixed(2);
     }
 
-    
-
     const subtotal = totalGeneral; 
-
     // 4. Tasa de pago (Bs por USD)
     const tasaEl = document.getElementById('tasapagohoy');
     const tasapago = parseFloat(tasaEl?.value) || 0;
-
     const subtotald = tasapago !== 0 ? subtotal / tasapago : 0;
 
     const subtotald1 = document.getElementById('total-generald');
@@ -156,7 +169,6 @@ function calcularTotalGeneral() {
     // 5. Descuento del panel (aplica sobre el subtotal)
     const inputPorDescuento = document.getElementById('pordescuentopanel');
     const PDescuentoPanel = parseFloat(inputPorDescuento?.value) || 0;
-
     const PorDescuento = subtotal * (PDescuentoPanel / 100);
 
    // 6. Precio con descuento (Bs)
@@ -196,7 +208,6 @@ function validarFormulario() {
         document.getElementById('empresa'),
         document.getElementById('email'),
     ];
-
     const errores = [];
 
     // for...of so we can `break`/`return` cleanly if needed
@@ -205,7 +216,6 @@ function validarFormulario() {
             console.warn('⚠️ Selector no encontró el elemento. Revisa los IDs en el HTML.');
             continue;
         }
-
         campo.classList.remove('error');
 
         if (campo.value.trim() === '') {
@@ -213,13 +223,11 @@ function validarFormulario() {
             errores.push(campo.placeholder || campo.name || 'campo');
         }
     }
-
     // ← alerta DESPUÉS del loop, no dentro
     if (errores.length > 0) {
         alert('Faltan datos en: ' + errores.join(', '));
         return false;
     }
-
     return true;
 }
 
@@ -236,7 +244,6 @@ if (boton) {
     console.error(" No se encontró el botón. Revisa el ID en el HTML.");
 }
 
-
 // Ejecutar la función automáticamente en cuanto cargue la página
 window.onload = function() {
     obtenerTasaBCV();
@@ -244,15 +251,9 @@ window.onload = function() {
 };
 
 const EditarPrecio = document.getElementById('PRECIO');
-
 EditarPrecio.addEventListener('input', function() {
-
    this.value = this.value.match(/[+-]?(?:\d+\.\d+|\d+\.|\.\d+|\d+)(?:[eE][+-]?\d+)?/)?.[0] || '';
-
-
-
-
-
 });
 
+// Reloj
 

@@ -17,6 +17,9 @@ function multiplicacion(elemento) {
 
     const PrecioVenta = parseFloat(fila.querySelector('.precio-venta').value) || 0;
 
+    const PrecioVentaConv = TasaPagoProductoHoy !== 0 ? (PrecioVenta / TasaPagoProductoHoy) : 0;
+    fila.querySelector('.ValorActualD').value = PrecioVentaConv.toFixed(2); 
+
     const GananciaSobreCosto = PrecioProducto * (PorcentajeDeGanancia / 100);
     fila.querySelector('.gananciasobrecosto').value = GananciaSobreCosto.toFixed(4); 
 
